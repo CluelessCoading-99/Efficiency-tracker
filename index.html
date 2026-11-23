@@ -1,0 +1,2356 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Efficiency Tracker</title>
+  <style>
+    :root {
+      --bg: #080d14;
+      --bg-grad: radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.14), transparent 45%),
+                 radial-gradient(circle at 18% 8%, rgba(6, 182, 212, 0.14), transparent 45%),
+                 linear-gradient(180deg, #0b111a 0%, #070b10 100%);
+      --card: rgba(15, 22, 33, 0.92);
+      --card-elevated: rgba(21, 31, 46, 0.96);
+      --border: rgba(148, 163, 184, 0.18);
+      --border-cyan: rgba(34, 211, 238, 0.34);
+      --border-emerald: rgba(16, 185, 129, 0.36);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --cyan: #22d3ee;
+      --emerald: #10b981;
+      --emerald-bright: #34d399;
+      --amber: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg-grad);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 56px;
+      -webkit-tap-highlight-color: rgba(34, 211, 238, 0.16);
+    }
+
+    .top-bar {
+      background: rgba(9, 14, 22, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .header-title h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: var(--text);
+    }
+
+    .tech-subtag {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--cyan);
+      margin-top: 1px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      background: rgba(34, 211, 238, 0.12);
+      border: 1px solid var(--border-cyan);
+      color: var(--cyan);
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .cog-btn {
+      background: var(--card-elevated);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      touch-action: manipulation;
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+
+    .cog-btn:hover {
+      border-color: var(--cyan);
+    }
+
+    .cog-btn:active {
+      transform: scale(0.95);
+    }
+
+    .date-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .date-controls > select {
+      flex: 1;
+    }
+
+    .year-box-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex: 0 0 118px;
+    }
+
+    .year-box-wrapper select {
+      padding-right: 32px;
+      font-weight: 700;
+    }
+
+    .year-add-inside-btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(34, 211, 238, 0.15);
+      border: 1px solid rgba(34, 211, 238, 0.42);
+      color: var(--cyan);
+      font-size: 0.9rem;
+      font-weight: 800;
+      line-height: 1;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .year-add-inside-btn:hover {
+      background: rgba(34, 211, 238, 0.28);
+    }
+
+    .year-add-inside-btn.locked {
+      opacity: 0.35;
+      border-color: rgba(148, 163, 184, 0.25);
+      background: rgba(30, 41, 59, 0.45);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    select, input, textarea {
+      background-color: #090e16;
+      color: var(--text);
+      color-scheme: dark;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.94rem;
+      width: 100%;
+    }
+
+    select option {
+      background-color: #0d1420;
+      color: var(--text);
+    }
+
+    select:focus, input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.16);
+    }
+
+    input[type="file"] {
+      padding: 7px;
+      font-size: 0.8rem;
+    }
+
+    .container {
+      padding: 12px;
+      max-width: 620px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .backup-banner {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(217, 119, 6, 0.12));
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
+    }
+
+    .backup-banner-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .backup-banner-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #fbbf24;
+      margin-bottom: 3px;
+    }
+
+    .backup-banner-text {
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .backup-banner-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .backup-banner-actions button {
+      padding: 8px 12px;
+      font-size: 0.82rem;
+    }
+
+    .btn-amber {
+      background: linear-gradient(135deg, #d97706, #f59e0b);
+      color: #090e16;
+      font-weight: 800;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 15px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .telemetry-top-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .kpi-box {
+      background: rgba(8, 13, 21, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 12px;
+    }
+
+    .kpi-box.amber-border {
+      border-color: rgba(245, 158, 11, 0.38);
+    }
+
+    .kpi-box.emerald-border {
+      border-color: var(--border-emerald);
+    }
+
+    .kpi-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .kpi-value {
+      font-size: 1.45rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value.amber-text { color: #fbbf24; }
+    .kpi-value.emerald-text { color: var(--emerald-bright); }
+
+    .mini-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 20px;
+    }
+
+    .mini-bars span {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      min-height: 4px;
+      transition: height 0.3s ease;
+    }
+
+    .mini-bars.amber-bars span {
+      background: linear-gradient(180deg, #fbbf24, rgba(245, 158, 11, 0.35));
+    }
+
+    .mini-bars.emerald-bars span {
+      background: linear-gradient(180deg, #34d399, rgba(16, 185, 129, 0.35));
+    }
+
+    .chart-panel {
+      background: rgba(8, 13, 21, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .chart-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .chart-panel-header strong {
+      color: var(--text);
+      font-size: 0.88rem;
+    }
+
+    .bar-chart-row {
+      margin-bottom: 10px;
+    }
+
+    .bar-chart-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .bar-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      margin-bottom: 5px;
+    }
+
+    .bar-track {
+      height: 10px;
+      background: rgba(30, 41, 59, 0.65);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill-req {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #06b6d4, #22d3ee);
+      transition: width 0.35s ease;
+    }
+
+    .bar-fill-given {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #059669, #34d399);
+      transition: width 0.35s ease;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      background: rgba(8, 13, 21, 0.78);
+      border: 1px solid var(--border);
+      padding: 10px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .summary-grid .label {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .summary-grid strong {
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .settings-grid, .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .categories-section {
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .main-category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .sub-options-box {
+      background: rgba(8, 13, 21, 0.74);
+      border: 1px dashed rgba(34, 211, 238, 0.36);
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+
+    .sub-options-title {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--cyan);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .nested-section {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.12s ease;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0891b2, #10b981);
+      color: #ffffff;
+      width: 100%;
+    }
+
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .full-width { width: 100%; margin-top: 6px; }
+    .hidden { display: none !important; }
+    .form-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .list-header h2 {
+      font-size: 0.98rem;
+      margin-bottom: 0;
+    }
+
+    .list-header select {
+      width: auto;
+      padding: 7px 10px;
+      font-size: 0.82rem;
+    }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    .search-box input {
+      padding-right: 36px;
+      font-size: 0.9rem;
+    }
+
+    .clear-search-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      color: var(--muted);
+      padding: 4px 6px;
+      font-size: 0.85rem;
+    }
+
+    .batch-bar {
+      background: rgba(34, 211, 238, 0.12);
+      border: 1px solid var(--border-cyan);
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .job-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .job-item {
+      background: rgba(10, 15, 24, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .job-item.pending { border-left: 4px solid var(--amber); }
+    .job-item.flag-green { border-left: 4px solid var(--emerald); }
+    .job-item.flag-amber { border-left: 4px solid var(--amber); }
+    .job-item.flag-red { border-left: 4px solid var(--danger); }
+
+    .job-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .wip-pill {
+      background: rgba(34, 211, 238, 0.12);
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      color: var(--cyan);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-align: center;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .job-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-weight: 700;
+      font-size: 0.94rem;
+    }
+
+    .speech-bubble {
+      background: rgba(24, 34, 50, 0.94);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.84rem;
+      color: var(--text);
+      margin-top: 8px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .speech-bubble::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 18px;
+      border-width: 0 6px 6px 6px;
+      border-style: solid;
+      border-color: transparent transparent rgba(24, 34, 50, 0.94) transparent;
+    }
+
+    .job-desc {
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-top: 6px;
+      margin-bottom: 6px;
+    }
+
+    .job-checklist-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .tag {
+      background: rgba(16, 185, 129, 0.13);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #6ee7b7;
+      font-size: 0.73rem;
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .flag-badge {
+      font-size: 0.68rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .badge-green { background: rgba(16, 185, 129, 0.18); color: var(--emerald-bright); }
+    .badge-amber { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+    .badge-red { background: rgba(239, 68, 68, 0.18); color: #f87171; }
+
+    .job-metrics {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.84rem;
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .job-actions button {
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      margin-left: 6px;
+    }
+
+    .btn-del {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #f87171;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 6, 12, 0.84);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.high-z {
+      z-index: 1100;
+    }
+
+    .modal-panel {
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: rgba(15, 22, 34, 0.98);
+      border: 1px solid var(--border-cyan);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 22px 54px rgba(0, 0, 0, 0.72);
+    }
+
+    .splash-panel {
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: rgba(15, 22, 34, 0.99);
+      border: 1px solid var(--border-cyan);
+      border-radius: 18px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.78);
+    }
+
+    .splash-panel.left-align {
+      text-align: left;
+    }
+
+    .splash-badge {
+      display: inline-block;
+      background: rgba(34, 211, 238, 0.14);
+      border: 1px solid var(--border-cyan);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .splash-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .splash-copy {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+
+    .splash-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .splash-actions button {
+      flex: 1;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .close-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 11px;
+      font-size: 0.85rem;
+    }
+
+    .settings-section {
+      padding-top: 12px;
+      margin-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .settings-section:first-child {
+      padding-top: 0;
+      margin-top: 0;
+      border-top: none;
+    }
+
+    .section-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .info-btn {
+      background: rgba(34, 211, 238, 0.14);
+      border: 1px solid var(--border-cyan);
+      color: var(--cyan);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .info-btn:hover {
+      background: rgba(34, 211, 238, 0.25);
+    }
+
+    .excel-preview-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border-cyan);
+      border-radius: 10px;
+      margin: 10px 0 12px 0;
+      background: #090e16;
+    }
+
+    .excel-preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      text-align: left;
+    }
+
+    .excel-preview-table th {
+      background: rgba(19, 78, 74, 0.9);
+      color: #ffffff;
+      font-weight: 700;
+      padding: 7px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      white-space: nowrap;
+    }
+
+    .excel-preview-table td {
+      padding: 6px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .excel-preview-table tr:nth-child(even) td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .guide-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 10px 0;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .guide-step {
+      background: rgba(8, 13, 21, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 11px;
+    }
+
+    .guide-step strong {
+      color: var(--cyan);
+    }
+
+    .backup-status-pill {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header class="top-bar">
+    <div class="header-title">
+      <div>
+        <h1>Efficiency Tracker</h1>
+        <span id="activeTechBanner" class="tech-subtag">Technician: Richard Harrison</span>
+      </div>
+      <div class="header-right">
+        <span id="conversionBadge" class="badge">Conv: 0%</span>
+        <button type="button" id="openSettingsBtn" onclick="openSettingsModal()" class="cog-btn" title="Settings, Import & Export" aria-label="Open Settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="date-controls">
+      <select id="monthSelect">
+        <option value="0">January</option>
+        <option value="1">February</option>
+        <option value="2">March</option>
+        <option value="3">April</option>
+        <option value="4">May</option>
+        <option value="5">June</option>
+        <option value="6">July</option>
+        <option value="7">August</option>
+        <option value="8">September</option>
+        <option value="9">October</option>
+        <option value="10">November</option>
+        <option value="11">December</option>
+      </select>
+
+      <div class="year-box-wrapper">
+        <select id="yearSelect"></select>
+        <button type="button" id="addYearBtn" onclick="requestAddNextYear()" class="year-add-inside-btn" title="Add next year (only available from the highest added year)">+</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Tuesday / Friday Backup Reminder Banner -->
+    <div id="backupReminderBanner" class="backup-banner hidden" role="region" aria-label="Backup Reminder">
+      <div class="backup-banner-top">
+        <div>
+          <div id="backupReminderTitle" class="backup-banner-title">Backup Day Reminder</div>
+          <div id="backupReminderText" class="backup-banner-text">
+            It's backup day! Save a JSON backup copy of your jobs to your computer so you never lose your hours.
+          </div>
+        </div>
+      </div>
+      <div class="backup-banner-actions">
+        <button type="button" onclick="triggerBackupFromBanner()" class="btn-amber">Backup JSON Now</button>
+        <button type="button" onclick="openJsonInfoSplash()" class="btn-secondary">How Backup Works (?)</button>
+        <button type="button" onclick="dismissBackupBannerToday()" class="btn-secondary">Remind Later</button>
+      </div>
+    </div>
+
+    <section class="card">
+      <div class="telemetry-top-grid">
+        <div class="kpi-box amber-border">
+          <div class="kpi-label">Requested %</div>
+          <div id="reqPercent" class="kpi-value amber-text">0.0%</div>
+          <div id="reqSparkBars" class="mini-bars amber-bars">
+            <span style="height:35%"></span>
+            <span style="height:55%"></span>
+            <span style="height:45%"></span>
+            <span style="height:75%"></span>
+            <span style="height:60%"></span>
+            <span style="height:90%"></span>
+          </div>
+        </div>
+
+        <div class="kpi-box emerald-border">
+          <div class="kpi-label">Given / Sold %</div>
+          <div id="givenPercent" class="kpi-value emerald-text">0.0%</div>
+          <div id="givenSparkBars" class="mini-bars emerald-bars">
+            <span style="height:30%"></span>
+            <span style="height:50%"></span>
+            <span style="height:65%"></span>
+            <span style="height:55%"></span>
+            <span style="height:80%"></span>
+            <span style="height:95%"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-panel">
+        <div class="chart-panel-header">
+          <strong>Hours vs. Target Chart</strong>
+          <span id="chartTargetLabel">Target: 0.0h</span>
+        </div>
+
+        <div class="bar-chart-row">
+          <div class="bar-meta">
+            <span>Requested Time</span>
+            <strong id="reqSubtext">0.0 / 0.0 hrs</strong>
+          </div>
+          <div class="bar-track">
+            <div id="reqBar" class="bar-fill-req" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="bar-chart-row">
+          <div class="bar-meta">
+            <span>Actual / Given Time</span>
+            <strong id="givenSubtext">0.0 / 0.0 hrs</strong>
+          </div>
+          <div class="bar-track">
+            <div id="givenBar" class="bar-fill-given" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div>
+          <span class="label">Base Days</span>
+          <strong id="baseDaysDisplay">0</strong>
+        </div>
+        <div>
+          <span class="label">Adj. Target</span>
+          <strong id="adjTargetDisplay">0.0h</strong>
+        </div>
+        <div>
+          <span class="label">To Hit 100%</span>
+          <strong id="remainingHrsDisplay">0.0h</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 id="formTitle">Log New Job</h2>
+      <form id="jobForm">
+        <input type="hidden" id="editJobId" />
+        <div class="form-row">
+          <label>Date <input type="date" id="jobDate" required /></label>
+          <label>WIP Number <input type="text" id="wipInput" inputmode="numeric" placeholder="e.g. 48291" required /></label>
+        </div>
+        <div class="form-row">
+          <label>Registration <input type="text" id="regInput" placeholder="e.g. AB21 XYZ" style="text-transform: uppercase;" required /></label>
+          <label>Job Description <input type="text" id="descInput" placeholder="e.g. Diagnostic & Repair Work" required /></label>
+        </div>
+
+        <div class="categories-section">
+          <span class="sub-options-title">Select Job Types & Checklists (Check all that apply)</span>
+          <div id="categoryCheckboxesContainer" class="main-category-grid"></div>
+        </div>
+
+        <div id="dynamicChecklistsContainer"></div>
+
+        <div class="form-row" style="margin-top: 12px;">
+          <label>Called / Req (hrs) <input type="number" id="reqHrsInput" step="0.1" min="0" placeholder="2.5" required /></label>
+          <label>Given / Sold (hrs) <input type="number" id="givenHrsInput" step="0.1" min="0" placeholder="Leave blank if pending" /></label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" id="submitJobBtn" class="btn-primary">Save Job</button>
+          <button type="button" id="cancelEditBtn" class="btn-secondary hidden">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="list-header">
+        <h2>Job Log & Discrepancy Flags</h2>
+        <select id="filterSelect">
+          <option value="today" selected>Today Only</option>
+          <option value="all">All Jobs (This Month)</option>
+          <option value="pending">Awaiting Time Given</option>
+          <option value="flagged">Flagged (Amber/Red)</option>
+        </select>
+      </div>
+
+      <div class="search-box">
+        <input type="search" id="searchInput" placeholder="Search WIP number or registration..." autocomplete="off" />
+        <button type="button" id="clearSearchBtn" class="clear-search-btn hidden" title="Clear search">✕</button>
+      </div>
+
+      <div id="batchActionsBar" class="batch-bar hidden">
+        <span id="selectedCountText" style="font-size: 0.85rem; font-weight: 600;">0 jobs selected</span>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" onclick="selectAllVisibleJobs()" class="btn-secondary" style="padding: 5px 10px; font-size: 0.8rem;">Select All</button>
+          <button type="button" onclick="deleteSelectedJobs()" class="btn-del" style="padding: 5px 10px; font-size: 0.8rem;">Delete Selected</button>
+        </div>
+      </div>
+
+      <div id="jobList" class="job-list"></div>
+    </section>
+  </main>
+
+  <!-- Add Year Confirmation Splash Screen -->
+  <div id="addYearSplash" class="modal-backdrop high-z hidden" role="dialog" aria-modal="true" aria-labelledby="addYearSplashTitle">
+    <div class="splash-panel">
+      <span class="splash-badge">Year Expansion</span>
+      <h2 id="addYearSplashTitle" class="splash-title">Add Year?</h2>
+      <p id="addYearSplashMessage" class="splash-copy">Are you sure you want to add the next year?</p>
+      <div class="splash-actions">
+        <button type="button" id="cancelAddYearBtn" onclick="closeAddYearSplash()" class="btn-secondary">Cancel</button>
+        <button type="button" id="confirmAddYearBtn" onclick="confirmAddNextYear()" class="btn-primary">Yes, Add Year</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CSV Format Info Splash Screen -->
+  <div id="csvInfoSplash" class="modal-backdrop high-z hidden" role="dialog" aria-modal="true" aria-labelledby="csvInfoTitle">
+    <div class="splash-panel left-align">
+      <span class="splash-badge">Excel & CSV Layout Guide</span>
+      <h2 id="csvInfoTitle" class="splash-title">How Your Excel File Must Look</h2>
+      <p class="splash-copy">
+        Keep your Excel sheet simple with just these <strong>5 columns</strong> in order (Columns A to E). You do not need descriptions, extra info, or comments.
+      </p>
+
+      <div class="excel-preview-wrap">
+        <table class="excel-preview-table">
+          <thead>
+            <tr>
+              <th>A: Technician</th>
+              <th>B: WIP</th>
+              <th>C: Date</th>
+              <th>D: Requested_Hrs</th>
+              <th>E: Given_Hrs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="csvPreviewTech1">Richard Harrison</td>
+              <td>48291</td>
+              <td>2026-11-23</td>
+              <td>2.5</td>
+              <td>2.5</td>
+            </tr>
+            <tr>
+              <td id="csvPreviewTech2">Richard Harrison</td>
+              <td>48304</td>
+              <td>2026-11-23</td>
+              <td>1.8</td>
+              <td>1.5</td>
+            </tr>
+            <tr>
+              <td id="csvPreviewTech3">Richard Harrison</td>
+              <td>48319</td>
+              <td>2026-11-23</td>
+              <td>3.0</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="guide-list">
+        <div class="guide-step">
+          <strong>1. Column A (Technician):</strong> Must match the technician selected in Settings (<span id="csvGuideSelectedTech" style="color:#34d399; font-weight:700;">Richard Harrison</span>). Rows for other technicians are ignored.
+        </div>
+        <div class="guide-step">
+          <strong>2. Column B (WIP):</strong> Your job WIP number. If the same WIP appears twice in the file, its hours are automatically added together.
+        </div>
+        <div class="guide-step">
+          <strong>3. Column C (Date):</strong> Use <strong>YYYY-MM-DD</strong> format (for example, <code>2026-11-23</code>).
+        </div>
+        <div class="guide-step">
+          <strong>4. Columns D &amp; E (Hours):</strong> Put called hours in <strong>D</strong> and invoiced/given hours in <strong>E</strong> (leave E blank if still waiting).
+        </div>
+        <div class="guide-step">
+          <strong>5. Save as CSV:</strong> In Excel, click <strong>File &rarr; Save As &rarr; CSV (Comma delimited) (*.csv)</strong>, then upload that file here.
+        </div>
+      </div>
+
+      <div class="splash-actions">
+        <button type="button" onclick="closeCsvInfoSplash()" class="btn-primary">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSON Backup & Restore Info Splash Screen -->
+  <div id="jsonInfoSplash" class="modal-backdrop high-z hidden" role="dialog" aria-modal="true" aria-labelledby="jsonInfoTitle">
+    <div class="splash-panel left-align">
+      <span class="splash-badge">Data Safety Guide</span>
+      <h2 id="jsonInfoTitle" class="splash-title">How JSON Backup &amp; Restore Works</h2>
+      <p class="splash-copy">
+        Your jobs are stored inside this computer's web browser. Backing up creates a small safety file on your computer in case your browser cache is ever cleared or you move to a new PC.
+      </p>
+
+      <div class="guide-list">
+        <div class="guide-step">
+          <strong>1. How to Back Up (Every Tuesday &amp; Friday):</strong><br />
+          Click <strong>Backup JSON</strong>. Your browser will download a file named <code>workshop_backup_YYYY-MM-DD.json</code> into your <strong>Downloads</strong> folder (or save it to your personal folder/USB stick).
+        </div>
+        <div class="guide-step">
+          <strong>2. How to Restore If Data Goes Missing:</strong><br />
+          Open <strong>Settings</strong>, tap <strong>Choose File</strong> under <em>Restore JSON Database Backup</em>, pick your latest <code>.json</code> backup file, and click <strong>Restore JSON</strong>. All your jobs, targets, and years will come right back.
+        </div>
+        <div class="guide-step">
+          <strong>3. Do Not Edit the JSON File:</strong><br />
+          You don't need to open or change the <code>.json</code> file in Excel—just keep the newest copy safe.
+        </div>
+      </div>
+
+      <div class="splash-actions">
+        <button type="button" onclick="closeJsonInfoSplash()" class="btn-primary">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h2 id="settingsTitle">Settings, Import &amp; Export</h2>
+        <button type="button" id="closeSettingsBtn" onclick="closeSettingsModal()" class="close-btn">Done</button>
+      </div>
+
+      <!-- Technician Profile Selector -->
+      <div class="settings-section">
+        <strong style="font-size: 0.92rem;">Active Technician Profile</strong>
+        <p class="hint">Select your name so CSV imports only load your invoiced hours.</p>
+        <div style="margin-top: 8px;">
+          <label>Technician Name
+            <select id="technicianSelect"></select>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <strong style="font-size: 0.92rem;">Month Target &amp; Attendance Adjustments</strong>
+        <div class="settings-grid">
+          <label>Daily Target (hrs) <input type="number" id="dailyTargetInput" step="0.1" min="1" max="24" /></label>
+          <label>Extra Days (e.g. Sat) <input type="number" id="extraDaysInput" step="0.5" min="0" /></label>
+          <label>Holiday Days (-Target) <input type="number" id="holidayDaysInput" step="0.5" min="0" /></label>
+          <label>Sick Days (Static Target) <input type="number" id="sickDaysInput" step="0.5" min="0" /></label>
+        </div>
+        <button type="button" id="saveSettingsBtn" class="btn-secondary full-width">Update Month Rules</button>
+      </div>
+
+      <div class="settings-section">
+        <div class="section-title-row">
+          <strong style="font-size: 0.92rem;">Import CSV Invoiced Hours</strong>
+          <button type="button" onclick="openCsvInfoSplash()" class="info-btn" title="See exact Excel / CSV format">ⓘ CSV Format Info</button>
+        </div>
+        <p id="csvTechHint" class="hint">Only imports rows matching Richard Harrison (5-column format: Technician, WIP, Date, Requested_Hrs, Given_Hrs).</p>
+        <div class="form-row">
+          <input type="file" id="csvFileInput" accept=".csv" />
+          <button type="button" id="importCsvBtn" class="btn-secondary">Process CSV</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="section-title-row">
+          <strong style="font-size: 0.92rem;">Backup &amp; Restore Database (JSON)</strong>
+          <button type="button" onclick="openJsonInfoSplash()" class="info-btn" title="How JSON backup and restore works">ⓘ How Backup Works</button>
+        </div>
+        <p class="hint">Save a backup every Tuesday &amp; Friday so your jobs are always safe.</p>
+        <span id="lastBackupStatus" class="backup-status-pill">Last backup: Not backed up yet</span>
+        <div class="form-row">
+          <button type="button" id="exportJsonBtn" class="btn-primary">Backup JSON</button>
+          <button type="button" id="exportCsvBtn" class="btn-secondary">Export CSV</button>
+        </div>
+        <div class="form-row" style="margin-top: 8px;">
+          <input type="file" id="jsonFileInput" accept=".json" />
+          <button type="button" id="importJsonBtn" class="btn-secondary">Restore JSON</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // TECHNICIAN LIST: Add or edit technician names here.
+    // Each entry needs a unique 'id', a 'name' shown in the dropdown, and
+    // 'match' (the text matched in Column A of the CSV, case-insensitive).
+    // =========================================================================
+    const TECHNICIANS = [
+      { id: 'richard_harrison', name: 'Richard Harrison', match: 'richard harrison' },
+      { id: 'adam_wells', name: 'Adam Wells', match: 'adam wells' },
+      { id: 'tech_3', name: 'Technician 3 (Edit Name)', match: 'technician 3' },
+      { id: 'tech_4', name: 'Technician 4 (Edit Name)', match: 'technician 4' }
+    ];
+
+    const STORAGE_KEY = 'workshop_tracker_v1';
+
+    let appData = {
+      selectedTechId: TECHNICIANS[0].id,
+      years: [2026],
+      defaultDailyTarget: 8.0,
+      monthSettings: {},
+      jobs: [],
+      lastBackupDate: null,
+      dismissedBackupDate: null
+    };
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (saved && typeof saved === 'object') {
+        appData = {
+          selectedTechId: saved.selectedTechId || TECHNICIANS[0].id,
+          years: Array.isArray(saved.years) && saved.years.length ? saved.years.map(Number) : [2026],
+          defaultDailyTarget: saved.defaultDailyTarget || 8.0,
+          monthSettings: saved.monthSettings || {},
+          jobs: Array.isArray(saved.jobs) ? saved.jobs : [],
+          lastBackupDate: saved.lastBackupDate || null,
+          dismissedBackupDate: saved.dismissedBackupDate || null
+        };
+      }
+    } catch (e) {}
+
+    const selectedJobIds = new Set();
+    let pendingNextYear = null;
+    let isAddingYear = false;
+
+    function getActiveTechnician() {
+      return TECHNICIANS.find(t => t.id === appData.selectedTechId) || TECHNICIANS[0];
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+      } catch (e) {}
+    }
+
+    const technicianSelect = document.getElementById('technicianSelect');
+    const activeTechBanner = document.getElementById('activeTechBanner');
+    const csvTechHint = document.getElementById('csvTechHint');
+    const lastBackupStatus = document.getElementById('lastBackupStatus');
+    const backupReminderBanner = document.getElementById('backupReminderBanner');
+    const backupReminderTitle = document.getElementById('backupReminderTitle');
+    const backupReminderText = document.getElementById('backupReminderText');
+
+    const yearSelect = document.getElementById('yearSelect');
+    const monthSelect = document.getElementById('monthSelect');
+    const addYearBtn = document.getElementById('addYearBtn');
+    const addYearSplash = document.getElementById('addYearSplash');
+    const addYearSplashTitle = document.getElementById('addYearSplashTitle');
+    const addYearSplashMessage = document.getElementById('addYearSplashMessage');
+
+    const csvInfoSplash = document.getElementById('csvInfoSplash');
+    const jsonInfoSplash = document.getElementById('jsonInfoSplash');
+
+    const settingsModal = document.getElementById('settingsModal');
+    const dailyTargetInput = document.getElementById('dailyTargetInput');
+    const extraDaysInput = document.getElementById('extraDaysInput');
+    const holidayDaysInput = document.getElementById('holidayDaysInput');
+    const sickDaysInput = document.getElementById('sickDaysInput');
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+
+    const jobForm = document.getElementById('jobForm');
+    const jobDate = document.getElementById('jobDate');
+    const wipInput = document.getElementById('wipInput');
+    const regInput = document.getElementById('regInput');
+    const categoryCheckboxesContainer = document.getElementById('categoryCheckboxesContainer');
+    const dynamicChecklistsContainer = document.getElementById('dynamicChecklistsContainer');
+    const descInput = document.getElementById('descInput');
+    const reqHrsInput = document.getElementById('reqHrsInput');
+    const givenHrsInput = document.getElementById('givenHrsInput');
+    const editJobId = document.getElementById('editJobId');
+    const formTitle = document.getElementById('formTitle');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const filterSelect = document.getElementById('filterSelect');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const jobList = document.getElementById('jobList');
+    const batchActionsBar = document.getElementById('batchActionsBar');
+    const selectedCountText = document.getElementById('selectedCountText');
+
+    const csvFileInput = document.getElementById('csvFileInput');
+    const importCsvBtn = document.getElementById('importCsvBtn');
+    const jsonFileInput = document.getElementById('jsonFileInput');
+    const importJsonBtn = document.getElementById('importJsonBtn');
+
+    const AVAILABLE_CATEGORIES = {
+      serviceA: { label: 'Service A', items: ['Oil', 'Filter', 'Sump Plug'] },
+      serviceB: { label: 'Service B', items: ['Oil', 'Filter', 'Sump Plug'] },
+      brakes: { label: 'Brake Fluid Change', items: ['N/S/F', 'O/S/F', 'N/S/R', 'O/S/R'] },
+      plugs: { label: 'Spark Plugs', items: ['Plug', 'Coil'] },
+      transmission: { label: 'Transmission Service', items: ['Oil', 'Filter', 'Plug & Transmission Bolts'] },
+      differential: { label: 'Differential Service', items: ['Oil', 'Diff Plugs'] },
+      coolant: { label: 'Coolant Change', items: ['Coolant Fluid', 'Bleed System'] },
+      fuelFilter: { label: 'Fuel Filter Replacement', items: ['Filter Unit', 'Seals / Clips'] },
+      airFilter: { label: 'Air Filter Replacement', items: ['Air Filter Element', 'Housing Clean'] }
+    };
+
+    function renderTechnicianOptions() {
+      technicianSelect.innerHTML = '';
+      TECHNICIANS.forEach(tech => {
+        const opt = document.createElement('option');
+        opt.value = tech.id;
+        opt.textContent = tech.name;
+        if (tech.id === appData.selectedTechId) opt.selected = true;
+        technicianSelect.appendChild(opt);
+      });
+      updateTechnicianLabels();
+    }
+
+    function updateTechnicianLabels() {
+      const tech = getActiveTechnician();
+      activeTechBanner.textContent = 'Technician: ' + tech.name;
+      csvTechHint.textContent = 'Only imports rows matching ' + tech.name + ' (5 columns: Technician, WIP, Date, Requested_Hrs, Given_Hrs).';
+      const p1 = document.getElementById('csvPreviewTech1');
+      const p2 = document.getElementById('csvPreviewTech2');
+      const p3 = document.getElementById('csvPreviewTech3');
+      const gTech = document.getElementById('csvGuideSelectedTech');
+      if (p1) p1.textContent = tech.name;
+      if (p2) p2.textContent = tech.name;
+      if (p3) p3.textContent = tech.name;
+      if (gTech) gTech.textContent = tech.name;
+    }
+
+    technicianSelect.addEventListener('change', () => {
+      appData.selectedTechId = technicianSelect.value;
+      saveData();
+      updateTechnicianLabels();
+    });
+
+    window.openSettingsModal = function() {
+      updateBackupStatusDisplay();
+      settingsModal.classList.remove('hidden');
+    };
+
+    window.closeSettingsModal = function() {
+      settingsModal.classList.add('hidden');
+    };
+
+    settingsModal.addEventListener('click', function(e) {
+      if (e.target === settingsModal) {
+        window.closeSettingsModal();
+      }
+    });
+
+    window.openCsvInfoSplash = function() {
+      updateTechnicianLabels();
+      csvInfoSplash.classList.remove('hidden');
+    };
+
+    window.closeCsvInfoSplash = function() {
+      csvInfoSplash.classList.add('hidden');
+    };
+
+    csvInfoSplash.addEventListener('click', function(e) {
+      if (e.target === csvInfoSplash) {
+        window.closeCsvInfoSplash();
+      }
+    });
+
+    window.openJsonInfoSplash = function() {
+      jsonInfoSplash.classList.remove('hidden');
+    };
+
+    window.closeJsonInfoSplash = function() {
+      jsonInfoSplash.classList.add('hidden');
+    };
+
+    jsonInfoSplash.addEventListener('click', function(e) {
+      if (e.target === jsonInfoSplash) {
+        window.closeJsonInfoSplash();
+      }
+    });
+
+    function getLocalDateISO(dateObj = new Date()) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + d;
+    }
+
+    function updateBackupStatusDisplay() {
+      if (appData.lastBackupDate) {
+        lastBackupStatus.textContent = 'Last JSON backup saved: ' + appData.lastBackupDate;
+      } else {
+        lastBackupStatus.textContent = 'Last JSON backup saved: Not backed up yet';
+      }
+    }
+
+    function checkTuesdayFridayBackupReminder() {
+      const now = new Date();
+      const dayOfWeek = now.getDay(); // 2 = Tuesday, 5 = Friday
+      const todayStr = getLocalDateISO(now);
+      const isBackupDay = (dayOfWeek === 2 || dayOfWeek === 5);
+
+      if (isBackupDay && appData.lastBackupDate !== todayStr && appData.dismissedBackupDate !== todayStr) {
+        const dayName = dayOfWeek === 2 ? 'Tuesday' : 'Friday';
+        backupReminderTitle.textContent = dayName + ' JSON Backup Reminder';
+        backupReminderText.textContent =
+          'It is ' + dayName + '! Save a quick JSON backup copy of your jobs so your hours are safe if this browser is ever reset.';
+        backupReminderBanner.classList.remove('hidden');
+      } else {
+        backupReminderBanner.classList.add('hidden');
+      }
+    }
+
+    window.triggerBackupFromBanner = function() {
+      performJsonBackup();
+    };
+
+    window.dismissBackupBannerToday = function() {
+      appData.dismissedBackupDate = getLocalDateISO();
+      saveData();
+      backupReminderBanner.classList.add('hidden');
+    };
+
+    function performJsonBackup() {
+      const todayStr = getLocalDateISO();
+      appData.lastBackupDate = todayStr;
+      saveData();
+      updateBackupStatusDisplay();
+      checkTuesdayFridayBackupReminder();
+      downloadFile(JSON.stringify(appData, null, 2), 'workshop_backup_' + todayStr + '.json', 'application/json');
+    }
+
+    function getHighestYear() {
+      const numericYears = (appData.years || []).map(Number).filter(n => !Number.isNaN(n));
+      return numericYears.length ? Math.max(...numericYears) : new Date().getFullYear();
+    }
+
+    function updateAddYearButtonState() {
+      const selectedYr = parseInt(yearSelect.value, 10);
+      const highestYr = getHighestYear();
+      const canAddFromHere = selectedYr === highestYr && !appData.years.includes(highestYr + 1);
+      addYearBtn.classList.toggle('locked', !canAddFromHere);
+      addYearBtn.setAttribute('aria-disabled', String(!canAddFromHere));
+      addYearBtn.title = canAddFromHere
+        ? 'Add year ' + (highestYr + 1)
+        : 'Switch to ' + highestYr + ' to add year ' + (highestYr + 1);
+    }
+
+    window.requestAddNextYear = function() {
+      if (isAddingYear) return;
+      const selectedYr = parseInt(yearSelect.value, 10);
+      const highestYr = getHighestYear();
+
+      if (selectedYr !== highestYr) {
+        alert('You can only add the next year (' + (highestYr + 1) + ') while viewing ' + highestYr + '.');
+        return;
+      }
+
+      const nextYr = highestYr + 1;
+      if (appData.years.includes(nextYr)) {
+        return;
+      }
+
+      pendingNextYear = nextYr;
+      addYearSplashTitle.textContent = 'Add Year ' + nextYr + '?';
+      addYearSplashMessage.textContent = 'Are you sure you want to add year ' + nextYr + ' to your tracker?';
+      addYearSplash.classList.remove('hidden');
+    };
+
+    window.closeAddYearSplash = function() {
+      pendingNextYear = null;
+      addYearSplash.classList.add('hidden');
+    };
+
+    window.confirmAddNextYear = function() {
+      if (isAddingYear || pendingNextYear === null) return;
+      isAddingYear = true;
+
+      try {
+        const highestYr = getHighestYear();
+        const selectedYr = parseInt(yearSelect.value, 10);
+        const expectedNext = highestYr + 1;
+
+        if (selectedYr === highestYr && pendingNextYear === expectedNext && !appData.years.includes(expectedNext)) {
+          appData.years.push(expectedNext);
+          appData.years = Array.from(new Set(appData.years.map(Number))).sort((a, b) => a - b);
+          saveData();
+          renderYearOptions(expectedNext);
+          refreshUI();
+        }
+      } finally {
+        pendingNextYear = null;
+        isAddingYear = false;
+        addYearSplash.classList.add('hidden');
+      }
+    };
+
+    addYearSplash.addEventListener('click', function(e) {
+      if (e.target === addYearSplash) {
+        window.closeAddYearSplash();
+      }
+    });
+
+    function init() {
+      const today = new Date();
+      const currentYear = today.getFullYear();
+      if (!Array.isArray(appData.years) || appData.years.length === 0) {
+        appData.years = [currentYear];
+      } else if (!appData.years.includes(currentYear)) {
+        appData.years.push(currentYear);
+      }
+      appData.years = Array.from(new Set(appData.years.map(Number))).sort((a, b) => a - b);
+
+      renderTechnicianOptions();
+      renderYearOptions(currentYear);
+      monthSelect.value = String(today.getMonth());
+      jobDate.value = getLocalDateISO(today);
+
+      renderCategorySelectorForm();
+      updateBackupStatusDisplay();
+      checkTuesdayFridayBackupReminder();
+      refreshUI();
+    }
+
+    function renderYearOptions(selectedYear) {
+      yearSelect.innerHTML = '';
+      appData.years.forEach(yr => {
+        const opt = document.createElement('option');
+        opt.value = String(yr);
+        opt.textContent = String(yr);
+        if (Number(yr) === Number(selectedYear)) opt.selected = true;
+        yearSelect.appendChild(opt);
+      });
+      if (!yearSelect.value && yearSelect.options.length > 0) {
+        yearSelect.selectedIndex = yearSelect.options.length - 1;
+      }
+      updateAddYearButtonState();
+    }
+
+    function renderCategorySelectorForm(savedSelections = {}) {
+      categoryCheckboxesContainer.innerHTML = '';
+      dynamicChecklistsContainer.innerHTML = '';
+
+      Object.entries(AVAILABLE_CATEGORIES).forEach(([catKey, catData]) => {
+        const isCatSelected = savedSelections[catKey] !== undefined;
+
+        const catLabel = document.createElement('label');
+        catLabel.className = 'checkbox-label';
+        catLabel.innerHTML =
+          '<input type="checkbox" name="mainCat" value="' + catKey + '" ' + (isCatSelected ? 'checked' : '') + ' onchange="handleCategoryToggle()" />' +
+          '<span>' + catData.label + '</span>';
+        categoryCheckboxesContainer.appendChild(catLabel);
+
+        if (isCatSelected) {
+          const subBox = document.createElement('div');
+          subBox.className = 'sub-options-box';
+          subBox.id = 'checklist_' + catKey;
+
+          const savedItems = savedSelections[catKey] || {};
+          const checkboxesHTML = catData.items.map(item => {
+            const isChecked = savedItems[item] || false;
+            return (
+              '<label class="checkbox-label">' +
+                '<input type="checkbox" name="sub_' + catKey + '" value="' + item + '" ' + (isChecked ? 'checked' : '') + ' />' +
+                '<span>' + item + '</span>' +
+              '</label>'
+            );
+          }).join('');
+
+          let extraContent = '';
+          if (catKey === 'brakes') {
+            const isGWagonChecked = savedItems['isGWagon'] || false;
+            extraContent =
+              '<div class="nested-section">' +
+                '<label class="checkbox-label" style="font-weight:600; color:var(--cyan); margin-bottom:6px;">' +
+                  '<input type="checkbox" name="gwagon_toggle" id="gwagonToggle" ' + (isGWagonChecked ? 'checked' : '') + ' onchange="handleGWagonToggle()" />' +
+                  '<span>G Wagon Model</span>' +
+                '</label>' +
+                '<div id="gwagonDiffContainer" class="' + (isGWagonChecked ? '' : 'hidden') + '" style="padding-left:12px; border-left:2px solid var(--cyan);">' +
+                  '<span class="sub-options-title" style="font-size:0.74rem; margin-top:4px;">G Wagon Differential Locks</span>' +
+                  '<div class="checkbox-grid">' +
+                    '<label class="checkbox-label">' +
+                      '<input type="checkbox" name="sub_' + catKey + '" value="Diff Lock Front" ' + (savedItems['Diff Lock Front'] ? 'checked' : '') + ' />' +
+                      '<span>Diff Lock Front</span>' +
+                    '</label>' +
+                    '<label class="checkbox-label">' +
+                      '<input type="checkbox" name="sub_' + catKey + '" value="Diff Lock Rear" ' + (savedItems['Diff Lock Rear'] ? 'checked' : '') + ' />' +
+                      '<span>Diff Lock Rear</span>' +
+                    '</label>' +
+                  '</div>' +
+                '</div>' +
+              '</div>';
+          }
+
+          subBox.innerHTML =
+            '<span class="sub-options-title">' + catData.label + ' Items</span>' +
+            '<div class="checkbox-grid">' + checkboxesHTML + '</div>' +
+            extraContent;
+          dynamicChecklistsContainer.appendChild(subBox);
+        }
+      });
+    }
+
+    window.handleCategoryToggle = function() {
+      const currentSelections = collectCurrentFormSelections();
+      renderCategorySelectorForm(currentSelections);
+    };
+
+    window.handleGWagonToggle = function() {
+      const diffContainer = document.getElementById('gwagonDiffContainer');
+      const gwagonToggle = document.getElementById('gwagonToggle');
+      if (diffContainer && gwagonToggle) {
+        if (gwagonToggle.checked) {
+          diffContainer.classList.remove('hidden');
+        } else {
+          diffContainer.classList.add('hidden');
+          diffContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        }
+      }
+    };
+
+    function collectCurrentFormSelections() {
+      const selections = {};
+      const mainCheckboxes = categoryCheckboxesContainer.querySelectorAll('input[name="mainCat"]:checked');
+
+      mainCheckboxes.forEach(cb => {
+        const catKey = cb.value;
+        selections[catKey] = {};
+
+        const subCheckboxes = dynamicChecklistsContainer.querySelectorAll('input[name="sub_' + catKey + '"]:checked');
+        subCheckboxes.forEach(subCb => {
+          selections[catKey][subCb.value] = true;
+        });
+
+        if (catKey === 'brakes') {
+          const gwagonToggle = document.getElementById('gwagonToggle');
+          if (gwagonToggle && gwagonToggle.checked) {
+            selections[catKey]['isGWagon'] = true;
+          }
+        }
+      });
+      return selections;
+    }
+
+    function getWeekdaysInMonth(year, month) {
+      let count = 0;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dayOfWeek = new Date(year, month, d).getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) count++;
+      }
+      return count;
+    }
+
+    function getMonthKey(year, month) {
+      return year + '-' + month;
+    }
+
+    function getMonthConfig(year, month) {
+      const key = getMonthKey(year, month);
+      if (!appData.monthSettings[key]) {
+        appData.monthSettings[key] = {
+          dailyTarget: appData.defaultDailyTarget || 8.0,
+          extraDays: 0,
+          holidayDays: 0,
+          sickDays: 0
+        };
+      }
+      return appData.monthSettings[key];
+    }
+
+    function updateSparkBars(containerId, pct) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const spans = container.querySelectorAll('span');
+      const clamped = Math.max(12, Math.min(100, pct));
+      const weights = [0.35, 0.52, 0.45, 0.72, 0.85, 1.0];
+      spans.forEach((sp, idx) => {
+        const h = Math.max(15, Math.min(100, clamped * (weights[idx] || 0.5)));
+        sp.style.height = h + '%';
+      });
+    }
+
+    function refreshUI() {
+      updateAddYearButtonState();
+
+      const now = new Date();
+      const parsedYear = parseInt(yearSelect.value, 10);
+      const parsedMonth = parseInt(monthSelect.value, 10);
+      const year = Number.isNaN(parsedYear) ? now.getFullYear() : parsedYear;
+      const month = Number.isNaN(parsedMonth) ? now.getMonth() : parsedMonth;
+
+      const config = getMonthConfig(year, month);
+
+      dailyTargetInput.value = config.dailyTarget;
+      extraDaysInput.value = config.extraDays;
+      holidayDaysInput.value = config.holidayDays;
+      sickDaysInput.value = config.sickDays;
+
+      const baseWeekdays = getWeekdaysInMonth(year, month);
+      const effectiveDays = Math.max(0, baseWeekdays + (parseFloat(config.extraDays) || 0) - (parseFloat(config.holidayDays) || 0));
+      const targetHours = effectiveDays * (parseFloat(config.dailyTarget) || 8.0);
+
+      const monthJobs = (appData.jobs || []).filter(job => {
+        if (!job.date) return false;
+        const d = new Date(job.date + 'T00:00:00');
+        return !Number.isNaN(d.getTime()) && d.getFullYear() === year && d.getMonth() === month;
+      }).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+      let totalReq = 0;
+      let totalGiven = 0;
+
+      monthJobs.forEach(j => {
+        totalReq += parseFloat(j.reqHrs) || 0;
+        if (j.givenHrs !== null && j.givenHrs !== '') {
+          totalGiven += parseFloat(j.givenHrs) || 0;
+        }
+      });
+
+      const reqPct = targetHours > 0 ? (totalReq / targetHours) * 100 : 0;
+      const givenPct = targetHours > 0 ? (totalGiven / targetHours) * 100 : 0;
+      const convPct = totalReq > 0 ? (totalGiven / totalReq) * 100 : 0;
+      const remaining = Math.max(0, targetHours - totalGiven);
+
+      document.getElementById('reqPercent').textContent = reqPct.toFixed(1) + '%';
+      document.getElementById('reqBar').style.width = Math.min(100, reqPct) + '%';
+      document.getElementById('reqSubtext').textContent = totalReq.toFixed(1) + ' / ' + targetHours.toFixed(1) + ' hrs';
+
+      document.getElementById('givenPercent').textContent = givenPct.toFixed(1) + '%';
+      document.getElementById('givenBar').style.width = Math.min(100, givenPct) + '%';
+      document.getElementById('givenSubtext').textContent = totalGiven.toFixed(1) + ' / ' + targetHours.toFixed(1) + ' hrs';
+
+      document.getElementById('chartTargetLabel').textContent = 'Target: ' + targetHours.toFixed(1) + 'h';
+      document.getElementById('conversionBadge').textContent = 'Conv: ' + convPct.toFixed(0) + '%';
+      document.getElementById('baseDaysDisplay').textContent = baseWeekdays + 'd (+' + config.extraDays + ' / -' + config.holidayDays + 'h)';
+      document.getElementById('adjTargetDisplay').textContent = targetHours.toFixed(1) + 'h';
+      document.getElementById('remainingHrsDisplay').textContent = remaining.toFixed(1) + 'h';
+
+      updateSparkBars('reqSparkBars', reqPct);
+      updateSparkBars('givenSparkBars', givenPct);
+
+      renderJobList(monthJobs);
+    }
+
+    function renderJobList(jobs) {
+      const filter = filterSelect.value;
+      const rawQuery = searchInput.value.trim().toLowerCase();
+      const compactQuery = rawQuery.replace(/\s+/g, '');
+      clearSearchBtn.classList.toggle('hidden', rawQuery.length === 0);
+
+      const todayStr = getLocalDateISO();
+
+      const filtered = jobs.filter(job => {
+        const isPending = job.givenHrs === null || job.givenHrs === '';
+        const req = parseFloat(job.reqHrs) || 0;
+        const given = parseFloat(job.givenHrs) || 0;
+        const diff = Math.abs(req - given);
+        const isFlagged = !isPending && diff > 0.20;
+
+        let matchesFilter = true;
+        if (filter === 'today') matchesFilter = job.date === todayStr;
+        else if (filter === 'pending') matchesFilter = isPending;
+        else if (filter === 'flagged') matchesFilter = isFlagged;
+
+        if (!matchesFilter) return false;
+
+        if (compactQuery) {
+          const wipMatch = (job.wip || '').toLowerCase().replace(/\s+/g, '').includes(compactQuery);
+          const regMatch = (job.reg || '').toLowerCase().replace(/\s+/g, '').includes(compactQuery);
+          const descMatch = (job.desc || '').toLowerCase().includes(rawQuery);
+          return wipMatch || regMatch || descMatch;
+        }
+
+        return true;
+      });
+
+      const visibleIds = new Set(filtered.map(j => String(j.id)));
+      Array.from(selectedJobIds).forEach(id => {
+        if (!visibleIds.has(String(id))) selectedJobIds.delete(id);
+      });
+
+      jobList.innerHTML = '';
+
+      if (filtered.length === 0) {
+        jobList.innerHTML = '<p class="hint" style="text-align:center;">No jobs matching your filter or search.</p>';
+        updateBatchBar();
+        return;
+      }
+
+      filtered.forEach(job => {
+        const jobIdStr = String(job.id);
+        const isPending = job.givenHrs === null || job.givenHrs === '';
+        const req = parseFloat(job.reqHrs) || 0;
+        const given = isPending ? 0 : parseFloat(job.givenHrs) || 0;
+        const diff = Math.abs(req - given);
+
+        let flagClass = 'flag-green';
+        let flagBadge = '<span class="flag-badge badge-green">Exact Match</span>';
+
+        if (isPending) {
+          flagClass = 'pending';
+          flagBadge = '<span class="flag-badge badge-amber">Pending</span>';
+        } else if (diff === 0) {
+          flagClass = 'flag-green';
+          flagBadge = '<span class="flag-badge badge-green">Green (0.0h Diff)</span>';
+        } else if (diff > 0.50) {
+          flagClass = 'flag-red';
+          flagBadge = '<span class="flag-badge badge-red">Red (-' + diff.toFixed(2) + 'h Diff)</span>';
+        } else if (diff > 0.20) {
+          flagClass = 'flag-amber';
+          flagBadge = '<span class="flag-badge badge-amber">Amber (-' + diff.toFixed(2) + 'h Diff)</span>';
+        } else {
+          flagClass = 'flag-green';
+          flagBadge = '<span class="flag-badge badge-green">Green (≤0.2h Diff)</span>';
+        }
+
+        const item = document.createElement('div');
+        item.className = 'job-item ' + flagClass;
+
+        const givenDisplay = isPending
+          ? '<span style="color:var(--amber)">Pending</span>'
+          : '<strong style="color:var(--emerald-bright)">' + parseFloat(job.givenHrs).toFixed(1) + 'h</strong>';
+
+        let tagsHTML = '';
+        if (job.categories) {
+          const activeTags = [];
+          Object.entries(job.categories).forEach(([catKey, itemsObj]) => {
+            const catName = AVAILABLE_CATEGORIES[catKey] ? AVAILABLE_CATEGORIES[catKey].label : catKey;
+            const checkedItems = Object.entries(itemsObj)
+              .filter(([itemName, isChecked]) => isChecked && itemName !== 'isGWagon')
+              .map(([itemName]) => itemName);
+
+            let labelExtra = '';
+            if (catKey === 'brakes' && itemsObj['isGWagon']) {
+              labelExtra = ' [G Wagon]';
+            }
+
+            if (checkedItems.length > 0) {
+              activeTags.push('<span class="tag">✓ ' + catName + labelExtra + ': ' + checkedItems.join(', ') + '</span>');
+            } else {
+              activeTags.push('<span class="tag">✓ ' + catName + labelExtra + '</span>');
+            }
+          });
+          if (activeTags.length > 0) {
+            tagsHTML = '<div class="job-checklist-tags">' + activeTags.join('') + '</div>';
+          }
+        }
+
+        let commentHTML = '';
+        if (job.comment && job.comment.trim() !== '') {
+          commentHTML =
+            '<div class="speech-bubble" onclick="editJobComment(\'' + jobIdStr + '\')" title="Click to edit comment">' +
+              '💬 ' + job.comment +
+            '</div>';
+        }
+
+        const isChecked = selectedJobIds.has(jobIdStr) ? 'checked' : '';
+
+        item.innerHTML =
+          '<div class="job-top">' +
+            '<div class="job-title-group">' +
+              '<input type="checkbox" class="job-checkbox" value="' + jobIdStr + '" ' + isChecked + ' onchange="toggleJobSelection(\'' + jobIdStr + '\', this)" style="width: 18px; height: 18px; accent-color: var(--cyan); cursor: pointer;" />' +
+              '<span class="wip-pill" onclick="editJobComment(\'' + jobIdStr + '\')" title="Click to add/edit comment">WIP #' + job.wip + '</span>' +
+              '<span>' + job.reg + '</span>' +
+              flagBadge +
+            '</div>' +
+            '<span style="font-size: 0.8rem; color: var(--muted); white-space: nowrap;">' + job.date + '</span>' +
+          '</div>' +
+          '<div class="job-desc">' + job.desc + '</div>' +
+          commentHTML +
+          tagsHTML +
+          '<div class="job-metrics">' +
+            '<div>Called: <strong>' + parseFloat(job.reqHrs).toFixed(1) + 'h</strong> &bull; Given: ' + givenDisplay + '</div>' +
+            '<div class="job-actions">' +
+              '<button type="button" onclick="editJob(\'' + jobIdStr + '\')" class="btn-secondary">Edit</button>' +
+              '<button type="button" onclick="deleteJob(\'' + jobIdStr + '\')" class="btn-del">Del</button>' +
+            '</div>' +
+          '</div>';
+        jobList.appendChild(item);
+      });
+      updateBatchBar();
+    }
+
+    searchInput.addEventListener('input', () => refreshUI());
+    clearSearchBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      refreshUI();
+    });
+
+    window.toggleJobSelection = function(id, checkbox) {
+      const idStr = String(id);
+      if (checkbox.checked) {
+        selectedJobIds.add(idStr);
+      } else {
+        selectedJobIds.delete(idStr);
+      }
+      updateBatchBar();
+    };
+
+    function updateBatchBar() {
+      if (selectedJobIds.size > 0) {
+        batchActionsBar.classList.remove('hidden');
+        selectedCountText.textContent = selectedJobIds.size + ' job(s) selected';
+      } else {
+        batchActionsBar.classList.add('hidden');
+      }
+    }
+
+    window.selectAllVisibleJobs = function() {
+      const checkboxes = document.querySelectorAll('.job-checkbox');
+      if (checkboxes.length === 0) return;
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      checkboxes.forEach(cb => {
+        cb.checked = !allChecked;
+        if (!allChecked) {
+          selectedJobIds.add(String(cb.value));
+        } else {
+          selectedJobIds.delete(String(cb.value));
+        }
+      });
+      updateBatchBar();
+    };
+
+    window.deleteSelectedJobs = function() {
+      if (selectedJobIds.size === 0) return;
+      if (!confirm('Are you sure you want to delete ' + selectedJobIds.size + ' selected job(s)?')) return;
+
+      appData.jobs = appData.jobs.filter(j => !selectedJobIds.has(String(j.id)));
+      selectedJobIds.clear();
+      saveData();
+      refreshUI();
+    };
+
+    window.editJobComment = function(id) {
+      const idStr = String(id);
+      const job = appData.jobs.find(j => String(j.id) === idStr);
+      if (!job) return;
+      const currentComment = job.comment || '';
+      const newComment = prompt('Enter/Edit comment for WIP ' + job.wip + ':', currentComment);
+      if (newComment !== null) {
+        job.comment = newComment.trim();
+        saveData();
+        refreshUI();
+      }
+    };
+
+    yearSelect.addEventListener('change', () => { selectedJobIds.clear(); refreshUI(); });
+    monthSelect.addEventListener('change', () => { selectedJobIds.clear(); refreshUI(); });
+    filterSelect.addEventListener('change', () => { selectedJobIds.clear(); refreshUI(); });
+
+    saveSettingsBtn.addEventListener('click', () => {
+      const year = parseInt(yearSelect.value, 10);
+      const month = parseInt(monthSelect.value, 10);
+      const config = getMonthConfig(year, month);
+
+      config.dailyTarget = parseFloat(dailyTargetInput.value) || 8.0;
+      config.extraDays = parseFloat(extraDaysInput.value) || 0;
+      config.holidayDays = parseFloat(holidayDaysInput.value) || 0;
+      config.sickDays = parseFloat(sickDaysInput.value) || 0;
+
+      saveData();
+      refreshUI();
+      alert('Month target settings updated.');
+    });
+
+    jobForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const id = String(editJobId.value || Date.now());
+      const givenVal = givenHrsInput.value.trim();
+      const categoriesData = collectCurrentFormSelections();
+
+      const existingJob = appData.jobs.find(j => String(j.id) === id);
+      const preservedComment = existingJob ? (existingJob.comment || '') : '';
+
+      const jobRecord = {
+        id,
+        date: jobDate.value,
+        wip: wipInput.value.trim(),
+        reg: regInput.value.trim().toUpperCase(),
+        categories: categoriesData,
+        desc: descInput.value.trim(),
+        reqHrs: parseFloat(reqHrsInput.value),
+        givenHrs: givenVal === '' ? null : parseFloat(givenVal),
+        comment: preservedComment,
+        externalSyncId: null
+      };
+
+      const existingIndex = appData.jobs.findIndex(j => String(j.id) === id);
+      if (existingIndex > -1) {
+        appData.jobs[existingIndex] = jobRecord;
+      } else {
+        appData.jobs.push(jobRecord);
+      }
+
+      saveData();
+      resetForm();
+
+      const d = new Date(jobRecord.date + 'T00:00:00');
+      if (!Number.isNaN(d.getTime())) {
+        if (!appData.years.includes(d.getFullYear())) {
+          appData.years.push(d.getFullYear());
+          appData.years = Array.from(new Set(appData.years.map(Number))).sort((a, b) => a - b);
+          renderYearOptions(d.getFullYear());
+        } else {
+          yearSelect.value = String(d.getFullYear());
+        }
+        monthSelect.value = String(d.getMonth());
+      }
+
+      refreshUI();
+    });
+
+    importCsvBtn.addEventListener('click', () => {
+      const file = csvFileInput.files[0];
+      if (!file) {
+        alert('Please select a CSV file first.');
+        return;
+      }
+
+      const activeTech = getActiveTechnician();
+      const targetMatch = (activeTech.match || activeTech.name).toLowerCase().trim();
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split(/\r\n|\n/);
+        if (lines.length < 2) {
+          alert('The CSV file appears empty or missing data rows.');
+          return;
+        }
+
+        let updatedCount = 0;
+        let foundTechs = new Set();
+        let seenCsvWips = new Set();
+
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+
+          const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.trim().replace(/^["']|["']$/g, ''));
+
+          if (parts.length >= 2) {
+            // Simplified 5-column layout:
+            // Col A (0): Technician | Col B (1): WIP | Col C (2): Date | Col D (3): Requested_Hrs | Col E (4): Given_Hrs
+            // Also supports legacy files where Technician was in Col B (1)
+            let techName = '';
+            let fileWip = '';
+            let fileDate = '';
+            let reqStr = '';
+            let givenStr = '';
+
+            if (parts[0] && parts[0].toLowerCase().includes(targetMatch)) {
+              techName = parts[0];
+              fileWip = parts[1] || '';
+              fileDate = parts[2] || '';
+              reqStr = parts[3] || '';
+              givenStr = parts[4] || '';
+            } else if (parts[1] && parts[1].toLowerCase().includes(targetMatch)) {
+              techName = parts[1];
+              fileWip = parts[2] || '';
+              fileDate = parts[3] || '';
+              reqStr = parts[4] || '';
+              givenStr = parts[5] || '';
+            } else {
+              techName = parts[0] || parts[1] || '';
+            }
+
+            if (techName && techName.toLowerCase() !== 'technician') {
+              foundTechs.add(techName);
+            }
+            if (!techName.toLowerCase().includes(targetMatch)) continue;
+
+            function parseHourVal(str) {
+              if (!str) return null;
+              const cleaned = str.toLowerCase().replace('hrs', '').replace('hr', '').trim().replace(',', '.');
+              const val = parseFloat(cleaned);
+              return isNaN(val) ? null : val;
+            }
+
+            const fileReq = parseHourVal(reqStr);
+            const fileGiven = parseHourVal(givenStr);
+
+            if (fileWip && fileWip.toLowerCase() !== 'wip') {
+              const wipKey = String(fileWip).trim();
+              const matchedJob = appData.jobs.find(j => String(j.wip).trim() === wipKey);
+
+              if (matchedJob) {
+                if (!seenCsvWips.has(wipKey)) {
+                  if (fileGiven !== null) matchedJob.givenHrs = fileGiven;
+                  if (fileReq !== null && !isNaN(fileReq)) matchedJob.reqHrs = fileReq;
+                  if (fileDate && fileDate.length >= 10) matchedJob.date = fileDate.substring(0, 10);
+                  seenCsvWips.add(wipKey);
+                } else {
+                  if (fileGiven !== null) {
+                    matchedJob.givenHrs = Math.round(((matchedJob.givenHrs || 0) + fileGiven) * 100) / 100;
+                  }
+                  if (fileReq !== null && !isNaN(fileReq)) {
+                    matchedJob.reqHrs = Math.round(((matchedJob.reqHrs || 0) + fileReq) * 100) / 100;
+                  }
+                  if (fileDate && fileDate.length >= 10) matchedJob.date = fileDate.substring(0, 10);
+                }
+                updatedCount++;
+              } else {
+                appData.jobs.push({
+                  id: String(Date.now()) + '-' + Math.random().toString(36).slice(2, 7),
+                  date: (fileDate && fileDate.length >= 10) ? fileDate.substring(0, 10) : getLocalDateISO(),
+                  wip: wipKey,
+                  reg: 'UNKNOWN',
+                  categories: {},
+                  desc: 'Imported from CSV',
+                  reqHrs: fileReq !== null ? fileReq : 0.0,
+                  givenHrs: fileGiven !== null ? fileGiven : null,
+                  comment: '',
+                  externalSyncId: null
+                });
+                seenCsvWips.add(wipKey);
+                updatedCount++;
+              }
+            }
+          }
+        }
+
+        saveData();
+        selectedJobIds.clear();
+        refreshUI();
+
+        const techsList = Array.from(foundTechs).join(', ') || 'None found';
+        alert(
+          'CSV processed for ' + activeTech.name + '!\n' +
+          '• Updated/Created: ' + updatedCount + ' job row(s).\n' +
+          '• Technicians seen in file: [' + techsList + ']'
+        );
+        csvFileInput.value = '';
+      };
+      reader.readAsText(file);
+    });
+
+    importJsonBtn.addEventListener('click', () => {
+      const file = jsonFileInput.files[0];
+      if (!file) {
+        alert('Please select a JSON backup file first.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          if (importedData && importedData.jobs && Array.isArray(importedData.jobs)) {
+            if (confirm('Restoring this backup will replace your current app database. Proceed?')) {
+              const normalizedJobs = importedData.jobs.map((j, idx) => ({
+                ...j,
+                id: String(j.id || (Date.now() + idx))
+              }));
+              appData = {
+                selectedTechId: importedData.selectedTechId || appData.selectedTechId || TECHNICIANS[0].id,
+                years: Array.isArray(importedData.years) ? Array.from(new Set(importedData.years.map(Number))).sort((a, b) => a - b) : [new Date().getFullYear()],
+                defaultDailyTarget: importedData.defaultDailyTarget || 8.0,
+                monthSettings: importedData.monthSettings || {},
+                jobs: normalizedJobs,
+                lastBackupDate: importedData.lastBackupDate || appData.lastBackupDate || null,
+                dismissedBackupDate: appData.dismissedBackupDate || null
+              };
+              saveData();
+              selectedJobIds.clear();
+              renderTechnicianOptions();
+              const currentYear = new Date().getFullYear();
+              if (!appData.years.includes(currentYear)) appData.years.push(currentYear);
+              appData.years = Array.from(new Set(appData.years.map(Number))).sort((a, b) => a - b);
+              renderYearOptions(currentYear);
+              updateBackupStatusDisplay();
+              refreshUI();
+              alert('JSON database successfully restored!');
+            }
+          } else {
+            alert('Invalid JSON backup file structure.');
+          }
+        } catch (err) {
+          alert('Error parsing JSON file: ' + err.message);
+        }
+        jsonFileInput.value = '';
+      };
+      reader.readAsText(file);
+    });
+
+    window.editJob = function(id) {
+      const idStr = String(id);
+      const job = appData.jobs.find(j => String(j.id) === idStr);
+      if (!job) return;
+
+      editJobId.value = idStr;
+      jobDate.value = job.date;
+      wipInput.value = job.wip;
+      regInput.value = job.reg;
+      renderCategorySelectorForm(job.categories || {});
+      descInput.value = job.desc;
+      reqHrsInput.value = job.reqHrs;
+      givenHrsInput.value = job.givenHrs !== null ? job.givenHrs : '';
+
+      formTitle.textContent = 'Editing WIP ' + job.wip;
+      cancelEditBtn.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.deleteJob = function(id) {
+      const idStr = String(id);
+      if (!confirm('Delete this job entry?')) return;
+      appData.jobs = appData.jobs.filter(j => String(j.id) !== idStr);
+      selectedJobIds.delete(idStr);
+      saveData();
+      refreshUI();
+    };
+
+    cancelEditBtn.addEventListener('click', resetForm);
+
+    function resetForm() {
+      editJobId.value = '';
+      wipInput.value = '';
+      regInput.value = '';
+      renderCategorySelectorForm({});
+      descInput.value = '';
+      reqHrsInput.value = '';
+      givenHrsInput.value = '';
+      formTitle.textContent = 'Log New Job';
+      cancelEditBtn.classList.add('hidden');
+    }
+
+    document.getElementById('exportCsvBtn').addEventListener('click', () => {
+      const tech = getActiveTechnician();
+      const headers = ['Technician', 'WIP', 'Date', 'Requested_Hrs', 'Given_Hrs'];
+      const rows = appData.jobs.map(j => [
+        '"' + tech.name.replace(/"/g, '""') + '"',
+        j.wip,
+        j.date,
+        j.reqHrs,
+        j.givenHrs ?? ''
+      ]);
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      downloadFile(csvContent, 'workshop_efficiency_log.csv', 'text/csv');
+    });
+
+    document.getElementById('exportJsonBtn').addEventListener('click', () => {
+      performJsonBackup();
+    });
+
+    function downloadFile(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    init();
+  </script>
+</body>
+</html>
+
