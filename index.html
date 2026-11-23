@@ -979,12 +979,12 @@
 <body>
   <header class="top-bar">
     <div class="header-inner">
-      <div class="header-title">
+      <div class="header-title" style="margin-bottom: 0;">
         <div>
           <h1>Efficiency Tracker</h1>
           <span id="activeTechBanner" class="tech-subtag">Technician: Richard Harrison</span>
         </div>
-        <div class="header-right">
+        <div class="header-right" style="display:flex; align-items:center; gap:8px;">
           <span id="conversionBadge" class="badge">Conv: 0%</span>
           <button type="button" id="openSettingsBtn" onclick="openSettingsModal()" class="cog-btn" title="Settings, Import & Export" aria-label="Open Settings">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
@@ -994,8 +994,29 @@
           </button>
         </div>
       </div>
+    </div>
+  </header>
 
-      <div class="period-strip" aria-label="Reporting Month and Year">
+  <main class="container">
+    <!-- Tuesday / Friday Backup Reminder Banner -->
+    <div id="backupReminderBanner" class="backup-banner hidden" role="region" aria-label="Backup Reminder">
+      <div class="backup-banner-top">
+        <div>
+          <div id="backupReminderTitle" class="backup-banner-title">Backup Day Reminder</div>
+          <div id="backupReminderText" class="backup-banner-text">
+            It's backup day! Save a JSON backup copy of your jobs to your computer so you never lose your hours.
+          </div>
+        </div>
+      </div>
+      <div class="backup-banner-actions">
+        <button type="button" onclick="triggerBackupFromBanner()" class="btn-amber">Backup JSON Now</button>
+        <button type="button" onclick="openJsonInfoSplash()" class="btn-secondary">How Backup Works (?)</button>
+        <button type="button" onclick="dismissBackupBannerToday()" class="btn-secondary">Remind Later</button>
+      </div>
+    </div>
+
+    <section class="card">
+      <div class="period-strip" style="margin-bottom: 12px;" aria-label="Reporting Month and Year">
         <span class="period-label">Period</span>
         <div class="date-controls">
           <div class="period-select-wrap period-month-wrap">
@@ -1021,28 +1042,7 @@
           </div>
         </div>
       </div>
-    </div>
-  </header>
 
-  <main class="container">
-    <!-- Tuesday / Friday Backup Reminder Banner -->
-    <div id="backupReminderBanner" class="backup-banner hidden" role="region" aria-label="Backup Reminder">
-      <div class="backup-banner-top">
-        <div>
-          <div id="backupReminderTitle" class="backup-banner-title">Backup Day Reminder</div>
-          <div id="backupReminderText" class="backup-banner-text">
-            It's backup day! Save a JSON backup copy of your jobs to your computer so you never lose your hours.
-          </div>
-        </div>
-      </div>
-      <div class="backup-banner-actions">
-        <button type="button" onclick="triggerBackupFromBanner()" class="btn-amber">Backup JSON Now</button>
-        <button type="button" onclick="openJsonInfoSplash()" class="btn-secondary">How Backup Works (?)</button>
-        <button type="button" onclick="dismissBackupBannerToday()" class="btn-secondary">Remind Later</button>
-      </div>
-    </div>
-
-    <section class="card">
       <div class="telemetry-top-grid">
         <div class="kpi-box amber-border">
           <div class="kpi-label">Requested %</div>
