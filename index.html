@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -1046,7 +1046,7 @@
       padding: 4px 10px;
       border-radius: 8px;
     }
-  </style>
+    </style>
 </head>
 <body>
   <header class="top-bar">
@@ -1265,7 +1265,7 @@
       <span class="splash-badge">Excel & CSV Layout Guide</span>
       <h2 id="csvInfoTitle" class="splash-title">How Your Excel File Must Look</h2>
       <p class="splash-copy">
-        Keep your Excel sheet simple with just these <strong>5 columns</strong> in order (Columns A to E). You do not need descriptions, extra info, or comments.
+        Keep your Excel sheet simple with just these <strong>5 columns</strong> in order (Columns A to E), using <strong>dot (.) decimals</strong> and <strong>plain numbers</strong> (no <code>Hrs</code> text).
       </p>
 
       <div class="excel-preview-wrap">
@@ -1310,16 +1310,16 @@
           <strong>1. Column A (Technician):</strong> Must match the technician selected in Settings (<span id="csvGuideSelectedTech" style="color:#34d399; font-weight:700;">Richard Harrison</span>). Rows for other technicians are ignored.
         </div>
         <div class="guide-step">
-          <strong>2. Column B (WIP):</strong> Your job WIP number. If the same WIP appears twice in the file, its hours are automatically added together.
+          <strong>2. Column B (WIP):</strong> Numeric job WIP number. If the same WIP appears twice in the file, its hours are added together.
         </div>
         <div class="guide-step">
-          <strong>3. Column C (Date):</strong> Use <strong>YYYY-MM-DD</strong> format (for example, <code>2026-11-23</code>).
+          <strong>3. Column C (Date):</strong> Use <strong>YYYY-MM-DD</strong> (such as <code>2026-11-23</code>), <strong>DD/MM/YYYY</strong>, or <strong>DD-MM-YYYY</strong>. Existing WIPs keep their saved date when updated; new rows use this date.
         </div>
         <div class="guide-step">
-          <strong>4. Columns D &amp; E (Hours):</strong> Put called hours in <strong>D</strong> and invoiced/given hours in <strong>E</strong> (leave E blank if still waiting).
+          <strong>4. Columns D &amp; E (Hours):</strong> Enter requested/called hours in <strong>D</strong> and invoiced/given hours in <strong>E</strong> as plain dot-decimal numbers (for example, <code>1.6</code> or <code>0.8</code>—never <code>1,6 Hrs</code>; leave <strong>E</strong> blank if still pending).
         </div>
         <div class="guide-step">
-          <strong>5. Save as CSV:</strong> In Excel, click <strong>File &rarr; Save As &rarr; CSV (Comma delimited) (*.csv)</strong>, then upload that file here.
+          <strong>5. Save as CSV:</strong> Set Excel's decimal separator to <strong>.</strong> (dot), remove any <code>Hrs</code> text, and save via <strong>File &rarr; Save As &rarr; CSV (Comma delimited) (*.csv)</strong> before importing.
         </div>
       </div>
 
@@ -1421,6 +1421,11 @@
   </div>
 
   <script>
+    // =========================================================================
+    // TECHNICIAN LIST: Add or edit technician names here.
+    // Each entry needs a unique 'id', a 'name' shown in the dropdown, and
+    // 'match' (the text matched in Column A of the CSV, case-insensitive).
+    // =========================================================================
     const TECHNICIANS = [
       { id: 'richard_harrison', name: 'Richard Harrison', match: 'richard harrison' },
       { id: 'adam_wells', name: 'Adam Wells', match: 'adam wells' },
@@ -1623,7 +1628,7 @@
 
     function checkTuesdayFridayBackupReminder() {
       const now = new Date();
-      const dayOfWeek = now.getDay();
+      const dayOfWeek = now.getDay(); // 2 = Tuesday, 5 = Friday
       const todayStr = getLocalDateISO(now);
       const isBackupDay = (dayOfWeek === 2 || dayOfWeek === 5);
 
@@ -2250,7 +2255,8 @@
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        const text = e.target.result;
+        const rawText = e.target.result || '';
+        const text = rawText.replace(/^\uFEFF/, '');
         const lines = text.split(/\r\n|\n/);
         if (lines.length < 2) {
           alert('The CSV file appears empty or missing data rows.');
@@ -2261,11 +2267,42 @@
         let foundTechs = new Set();
         let seenCsvWips = new Set();
 
+        function normalizeCsvDate(rawDate) {
+          const s = String(rawDate || '').trim();
+          if (!s) return null;
+          if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.substring(0, 10);
+          const dmy = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+          if (dmy) {
+            return dmy[3] + '-' + dmy[2].padStart(2, '0') + '-' + dmy[1].padStart(2, '0');
+          }
+          return null;
+        }
+
+        function parseHourVal(str) {
+          if (!str) return null;
+          const cleaned = String(str)
+            .replace(/\u00a0/g, ' ')
+            .toLowerCase()
+            .replace(/hrs?/g, '')
+            .trim()
+            .replace(',', '.');
+          const val = parseFloat(cleaned);
+          return isNaN(val) ? null : val;
+        }
+
         for (let i = 1; i < lines.length; i++) {
           const line = lines[i].trim();
           if (!line) continue;
 
-          const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.trim().replace(/^["']|["']$/g, ''));
+          // Detect delimiter automatically (comma vs semicolon from locale-formatted CSVs)
+          const commaCount = (line.match(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/g) || []).length;
+          const semiCount = (line.match(/;(?=(?:(?:[^"]*"){2})*[^"]*$)/g) || []).length;
+          const delimiter = (semiCount > commaCount && semiCount >= 4) ? ';' : ',';
+          const splitRegex = delimiter === ';'
+            ? /;(?=(?:(?:[^"]*"){2})*[^"]*$)/
+            : /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+
+          const parts = line.split(splitRegex).map(p => p.trim().replace(/^["']|["']$/g, ''));
 
           if (parts.length >= 2) {
             let techName = '';
@@ -2295,25 +2332,22 @@
             }
             if (!techName.toLowerCase().includes(targetMatch)) continue;
 
-            function parseHourVal(str) {
-              if (!str) return null;
-              const cleaned = str.toLowerCase().replace('hrs', '').replace('hr', '').trim().replace(',', '.');
-              const val = parseFloat(cleaned);
-              return isNaN(val) ? null : val;
-            }
+            // Clean WIP so trailing hour text like "6 Hrs" is stripped if shifted
+            let wipKey = String(fileWip || '').replace(/\s*hrs?\s*$/i, '').trim();
+            const isNumericWip = /^\d+$/.test(wipKey);
 
+            const normDate = normalizeCsvDate(fileDate);
             const fileReq = parseHourVal(reqStr);
             const fileGiven = parseHourVal(givenStr);
 
-            if (fileWip && fileWip.toLowerCase() !== 'wip') {
-              const wipKey = String(fileWip).trim();
+            // Guard against misparsed/non-WIP rows creating junk "UNKNOWN" entries
+            if (wipKey && wipKey.toLowerCase() !== 'wip' && isNumericWip) {
               const matchedJob = appData.jobs.find(j => String(j.wip).trim() === wipKey);
 
               if (matchedJob) {
                 if (!seenCsvWips.has(wipKey)) {
                   if (fileGiven !== null) matchedJob.givenHrs = fileGiven;
                   if (fileReq !== null && !isNaN(fileReq)) matchedJob.reqHrs = fileReq;
-                  if (fileDate && fileDate.length >= 10) matchedJob.date = fileDate.substring(0, 10);
                   seenCsvWips.add(wipKey);
                 } else {
                   if (fileGiven !== null) {
@@ -2322,13 +2356,12 @@
                   if (fileReq !== null && !isNaN(fileReq)) {
                     matchedJob.reqHrs = Math.round(((matchedJob.reqHrs || 0) + fileReq) * 100) / 100;
                   }
-                  if (fileDate && fileDate.length >= 10) matchedJob.date = fileDate.substring(0, 10);
                 }
                 updatedCount++;
               } else {
                 appData.jobs.push({
                   id: String(Date.now()) + '-' + Math.random().toString(36).slice(2, 7),
-                  date: (fileDate && fileDate.length >= 10) ? fileDate.substring(0, 10) : getLocalDateISO(),
+                  date: normDate || getLocalDateISO(),
                   wip: wipKey,
                   reg: 'UNKNOWN',
                   categories: {},
@@ -2482,4 +2515,3 @@
   </script>
 </body>
 </html>
-
