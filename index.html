@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -813,6 +813,8 @@
       margin-top: 8px;
       position: relative;
       cursor: pointer;
+      white-space: pre-line;
+      word-break: break-word;
     }
 
     .speech-bubble::before {
@@ -1319,6 +1321,7 @@
         color: #0f172a !important;
         border: 1px solid #94a3b8 !important;
         font-weight: 500;
+        white-space: pre-line;
       }
       .speech-bubble::before {
         display: none !important;
@@ -1522,6 +1525,7 @@
         <div class="batch-bar-actions">
           <button type="button" onclick="printJobs()" class="btn-print" style="padding: 5px 10px; font-size: 0.78rem;">🖨️ Print Selected</button>
           <button type="button" onclick="selectAllVisibleJobs()" class="btn-secondary" style="padding: 5px 10px; font-size: 0.78rem;">Select All</button>
+          <button type="button" onclick="clearSelectedJobs()" class="btn-secondary" style="padding: 5px 10px; font-size: 0.78rem;">Clear Selection</button>
           <button type="button" onclick="deleteSelectedJobs()" class="btn-del" style="padding: 5px 10px; font-size: 0.78rem;">Delete Selected</button>
         </div>
       </div>
@@ -2659,6 +2663,16 @@
       updateBatchBar();
     };
 
+    window.clearSelectedJobs = function() {
+      if (selectedJobIds.size === 0) return;
+      selectedJobIds.clear();
+      document.querySelectorAll('.job-checkbox').forEach(cb => { cb.checked = false; });
+      document.querySelectorAll('.job-item.is-selected-for-print').forEach(card => {
+        card.classList.remove('is-selected-for-print');
+      });
+      updateBatchBar();
+    };
+
     window.printJobs = function() {
       const hasSelection = selectedJobIds.size > 0;
       const jobsToPrint = hasSelection
@@ -2743,7 +2757,7 @@
       if (!job) return;
       const newComment = await customPrompt('Comment for WIP #' + job.wip, 'Enter or edit notes:', job.comment || '', true);
       if (newComment !== null) {
-        job.comment = newComment.trim();
+        job.comment = newComment.replace(/\r\n/g, '\n').trim();
         saveData();
         refreshUI();
         showToast('Comment saved', 'success');
@@ -3155,4 +3169,3 @@
   </script>
 </body>
 </html>
-
