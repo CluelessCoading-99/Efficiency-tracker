@@ -140,19 +140,21 @@
     .cog-btn:hover svg { transform: rotate(45deg); }
     .cog-btn:active { transform: scale(0.94); }
 
+    /* ========== IMPROVED TELEMETRY DASHBOARD ========== */
     .period-strip {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      padding: 6px 8px 6px 12px;
-      background: rgba(15, 23, 36, 0.9);
+      padding: 7px 10px 7px 14px;
+      background: rgba(15, 23, 36, 0.92);
       border: 1px solid var(--border);
       border-radius: 13px;
+      margin-bottom: 14px;
     }
 
     .period-label {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -166,40 +168,64 @@
       gap: 6px;
       align-items: center;
       flex: 1;
-      max-width: 320px;
+      max-width: 390px;
       margin-left: auto;
+      min-width: 0;
     }
 
     .period-nav-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 9px;
-      background: rgba(30, 41, 59, 0.8);
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(30, 41, 59, 0.85);
       border: 1px solid var(--border);
       color: var(--text-secondary);
-      font-size: 0.95rem;
+      font-size: 1rem;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
       flex-shrink: 0;
     }
 
     .period-nav-btn:hover {
       border-color: var(--cyan);
       color: var(--cyan);
-      background: rgba(34, 211, 238, 0.1);
+      background: rgba(34, 211, 238, 0.12);
     }
 
-    .period-month-wrap { flex: 1 1 auto; min-width: 0; }
+    .today-btn {
+      height: 34px;
+      padding: 0 11px;
+      border-radius: 10px;
+      background: rgba(34, 211, 238, 0.12);
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      color: var(--cyan);
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .today-btn:hover {
+      background: rgba(34, 211, 238, 0.22);
+      border-color: var(--cyan);
+    }
+
+    .period-month-wrap {
+      flex: 1 1 auto;
+      min-width: 96px;
+    }
 
     .period-month-wrap select,
     .year-box-wrapper select {
       background-color: #090f18;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      border-radius: 9px;
-      padding: 6px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 10px;
+      padding: 6px 8px;
       font-size: 0.85rem;
       font-weight: 600;
       height: 34px;
@@ -225,11 +251,11 @@
       transform: translateY(-50%);
       width: 22px;
       height: 22px;
-      border-radius: 6px;
-      background: rgba(34, 211, 238, 0.15);
-      border: 1px solid rgba(34, 211, 238, 0.42);
+      border-radius: 7px;
+      background: rgba(34, 211, 238, 0.16);
+      border: 1px solid rgba(34, 211, 238, 0.44);
       color: var(--cyan);
-      font-size: 0.9rem;
+      font-size: 0.92rem;
       font-weight: 800;
       line-height: 1;
       padding: 0;
@@ -239,7 +265,8 @@
       cursor: pointer;
     }
 
-    .year-add-inside-btn:hover { background: rgba(34, 211, 238, 0.28); }
+    .year-add-inside-btn:hover { background: rgba(34, 211, 238, 0.3); }
+
     .year-add-inside-btn.locked {
       opacity: 0.35;
       border-color: rgba(148, 163, 184, 0.2);
@@ -337,147 +364,206 @@
       letter-spacing: -0.01em;
     }
 
+    /* KPI Grid */
     .telemetry-top-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 11px;
-      margin-bottom: 12px;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
     .kpi-box {
       background: var(--surface-inset);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 12px 13px;
+      padding: 14px 15px;
+      position: relative;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .kpi-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .kpi-box.amber-border::before {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    }
+
+    .kpi-box.emerald-border::before {
+      background: linear-gradient(90deg, #059669, #34d399);
     }
 
     .kpi-box.amber-border {
-      border-color: rgba(245, 158, 11, 0.34);
-      background: linear-gradient(180deg, rgba(245, 158, 11, 0.06), rgba(7, 12, 20, 0.92));
+      border-color: rgba(245, 158, 11, 0.32);
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.06), rgba(7, 12, 20, 0.94));
     }
 
     .kpi-box.emerald-border {
-      border-color: var(--border-emerald);
-      background: linear-gradient(180deg, rgba(16, 185, 129, 0.06), rgba(7, 12, 20, 0.92));
+      border-color: rgba(16, 185, 129, 0.38);
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.08), rgba(7, 12, 20, 0.94));
     }
 
     .kpi-label {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.07em;
       color: var(--muted);
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .kpi-value {
-      font-size: 1.55rem;
+      font-size: 1.75rem;
       font-weight: 800;
       font-variant-numeric: tabular-nums;
-      line-height: 1.15;
-      margin-bottom: 4px;
+      line-height: 1.1;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
     }
 
     .kpi-value.amber-text { color: var(--amber-bright); }
     .kpi-value.emerald-text { color: var(--emerald-bright); }
 
     .kpi-delta {
+      display: inline-flex;
+      align-items: center;
       font-size: 0.72rem;
       font-weight: 600;
-      margin-bottom: 7px;
       font-variant-numeric: tabular-nums;
+      padding: 3px 9px;
+      border-radius: 999px;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .kpi-delta.up { color: var(--emerald-bright); }
-    .kpi-delta.down { color: #f87171; }
-    .kpi-delta.flat { color: var(--muted); }
-
-    .mini-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      height: 20px;
+    .kpi-delta.up {
+      color: var(--emerald-bright);
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.28);
     }
 
-    .mini-bars span {
-      flex: 1;
-      border-radius: 3px 3px 0 0;
-      min-height: 3px;
-      transition: height 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    .kpi-delta.down {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.25);
     }
 
-    .mini-bars.amber-bars span {
-      background: linear-gradient(180deg, #fbbf24, rgba(245, 158, 11, 0.28));
+    .kpi-delta.flat {
+      color: var(--muted);
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.18);
     }
 
-    .mini-bars.emerald-bars span {
-      background: linear-gradient(180deg, #34d399, rgba(16, 185, 129, 0.28));
-    }
-
+    /* Chart panel */
     .chart-panel {
       background: var(--surface-inset);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 13px;
-      margin-bottom: 12px;
+      padding: 15px;
+      margin-bottom: 14px;
     }
 
     .chart-panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.81rem;
+      gap: 8px;
+      font-size: 0.82rem;
       color: var(--muted);
-      margin-bottom: 11px;
+      margin-bottom: 14px;
     }
 
     .chart-panel-header strong {
       color: var(--text);
-      font-size: 0.88rem;
+      font-size: 0.9rem;
     }
 
-    .bar-chart-row { margin-bottom: 11px; }
-    .bar-chart-row:last-child { margin-bottom: 0; }
+    .bar-chart-row {
+      margin-bottom: 16px;
+    }
+
+    .bar-chart-row:last-child {
+      margin-bottom: 2px;
+    }
 
     .bar-meta {
       display: flex;
       justify-content: space-between;
-      font-size: 0.82rem;
+      gap: 8px;
+      font-size: 0.83rem;
       color: var(--text-secondary);
-      margin-bottom: 5px;
+      margin-bottom: 14px;
       font-variant-numeric: tabular-nums;
     }
 
     .bar-meta strong { color: var(--text); }
 
     .bar-track {
-      height: 10px;
-      background: rgba(30, 41, 59, 0.72);
+      position: relative;
+      height: 12px;
+      background: rgba(30, 41, 59, 0.75);
       border-radius: 999px;
-      overflow: hidden;
+      overflow: visible;
     }
 
-    .bar-fill-req {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #0284c7, #22d3ee);
-      transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
+    .bar-fill-req,
     .bar-fill-given {
       height: 100%;
       border-radius: 999px;
-      background: linear-gradient(90deg, #059669, #34d399);
-      transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      max-width: 100%;
+      transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
+    .bar-fill-req {
+      background: linear-gradient(90deg, #0284c7, #22d3ee);
+    }
+
+    .bar-fill-given {
+      background: linear-gradient(90deg, #059669, #34d399);
+    }
+
+    .bar-target-marker {
+      position: absolute;
+      top: -3px;
+      bottom: -3px;
+      width: 2px;
+      background: rgba(248, 250, 252, 0.88);
+      border-radius: 2px;
+      left: 100%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+      pointer-events: none;
+    }
+
+    .bar-target-marker::after {
+      content: '100%';
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* Summary strip */
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: 1fr 1fr 1.2fr;
       gap: 8px;
+      align-items: center;
       background: var(--surface-inset);
       border: 1px solid var(--border);
-      padding: 11px 10px;
+      padding: 12px 10px;
       border-radius: 14px;
       text-align: center;
       font-variant-numeric: tabular-nums;
@@ -485,7 +571,7 @@
 
     .summary-grid .label {
       display: block;
-      font-size: 0.69rem;
+      font-size: 0.67rem;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: var(--muted);
@@ -493,9 +579,29 @@
     }
 
     .summary-grid strong {
-      font-size: 0.9rem;
+      font-size: 0.92rem;
       font-weight: 700;
       color: var(--text);
+    }
+
+    .summary-grid .remaining-cell {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 10px;
+      padding: 6px 6px;
+    }
+
+    .summary-grid .remaining-cell strong {
+      color: var(--emerald-bright);
+    }
+
+    .summary-grid .remaining-cell.complete {
+      background: rgba(34, 211, 238, 0.08);
+      border-color: rgba(34, 211, 238, 0.28);
+    }
+
+    .summary-grid .remaining-cell.complete strong {
+      color: var(--cyan);
     }
 
     .summary-sub {
@@ -507,11 +613,11 @@
     }
 
     .bank-holiday-note {
-      font-size: 0.75rem;
+      font-size: 0.76rem;
       color: var(--muted);
       text-align: center;
-      margin-top: 8px;
-      padding-top: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
       border-top: 1px solid var(--border);
     }
 
@@ -1229,6 +1335,24 @@
       font-variant-numeric: tabular-nums;
     }
 
+    @media (max-width: 480px) {
+      .period-strip {
+        flex-wrap: wrap;
+        padding: 8px 10px;
+      }
+      .date-controls {
+        max-width: 100%;
+        flex-basis: 100%;
+        flex-wrap: wrap;
+      }
+      .telemetry-top-grid {
+        grid-template-columns: 1fr;
+      }
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media print {
       @page {
         margin: 12mm;
@@ -1241,7 +1365,7 @@
       }
       .top-bar, .backup-banner, #telemetryCard, #jobFormCard,
       .search-box, .search-scope-note, .batch-bar, .job-actions, .job-checkbox,
-      .cog-btn, .period-nav-btn, #toastContainer, .modal-backdrop,
+      .cog-btn, .period-nav-btn, .today-btn, #toastContainer, .modal-backdrop,
       .list-controls, .list-header, .year-add-inside-btn, .form-actions {
         display: none !important;
       }
@@ -1342,7 +1466,7 @@
           <button type="button" id="openSettingsBtn" onclick="openSettingsModal()" class="cog-btn" title="Settings, Import & Export" aria-label="Open Settings">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
               <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
           </button>
         </div>
@@ -1366,10 +1490,12 @@
     </div>
 
     <section id="telemetryCard" class="card">
-      <div class="period-strip" style="margin-bottom: 12px;" aria-label="Reporting Month and Year">
+      <!-- Period controls -->
+      <div class="period-strip" role="group" aria-label="Reporting Month and Year">
         <span class="period-label">Period</span>
         <div class="date-controls">
           <button type="button" class="period-nav-btn" onclick="shiftMonth(-1)" title="Previous month" aria-label="Previous month">‹</button>
+
           <div class="period-month-wrap">
             <select id="monthSelect" aria-label="Select Month">
               <option value="0">January</option>
@@ -1386,61 +1512,66 @@
               <option value="11">December</option>
             </select>
           </div>
+
           <div class="year-box-wrapper">
             <select id="yearSelect" aria-label="Select Year"></select>
-            <button type="button" id="addYearBtn" onclick="requestAddNextYear()" class="year-add-inside-btn" title="Add next year">+</button>
+            <button type="button" id="addYearBtn" onclick="requestAddNextYear()" class="year-add-inside-btn" title="Add next year" aria-label="Add next year">+</button>
           </div>
+
           <button type="button" class="period-nav-btn" onclick="shiftMonth(1)" title="Next month" aria-label="Next month">›</button>
+          <button type="button" class="today-btn" onclick="jumpToToday()" title="Jump to current month">Today</button>
         </div>
       </div>
 
+      <!-- KPI cards -->
       <div class="telemetry-top-grid">
         <div class="kpi-box amber-border">
           <div class="kpi-label">Requested %</div>
           <div id="reqPercent" class="kpi-value amber-text">0.0%</div>
           <div id="reqDelta" class="kpi-delta flat">—</div>
-          <div id="reqSparkBars" class="mini-bars amber-bars">
-            <span></span><span></span><span></span><span></span><span></span><span></span>
-          </div>
         </div>
+
         <div class="kpi-box emerald-border">
           <div class="kpi-label">Given / Sold %</div>
           <div id="givenPercent" class="kpi-value emerald-text">0.0%</div>
           <div id="givenDelta" class="kpi-delta flat">—</div>
-          <div id="givenSparkBars" class="mini-bars emerald-bars">
-            <span></span><span></span><span></span><span></span><span></span><span></span>
-          </div>
         </div>
       </div>
 
+      <!-- Hours vs Target bars -->
       <div class="chart-panel">
         <div class="chart-panel-header">
           <strong>Hours vs Target</strong>
           <span id="chartTargetLabel">Target: 0.0h</span>
         </div>
+
         <div class="bar-chart-row">
           <div class="bar-meta">
-            <span>Requested Time</span>
+            <span>Called / Requested</span>
             <strong id="reqSubtext">0.0 / 0.0 hrs</strong>
           </div>
           <div class="bar-track">
             <div id="reqBar" class="bar-fill-req" style="width: 0%"></div>
+            <div class="bar-target-marker" aria-hidden="true"></div>
           </div>
         </div>
+
         <div class="bar-chart-row">
           <div class="bar-meta">
-            <span>Actual / Given Time</span>
+            <span>Sold / Given</span>
             <strong id="givenSubtext">0.0 / 0.0 hrs</strong>
           </div>
           <div class="bar-track">
             <div id="givenBar" class="bar-fill-given" style="width: 0%"></div>
+            <div class="bar-target-marker" aria-hidden="true"></div>
           </div>
         </div>
       </div>
 
-      <div class="summary-grid">
+      <!-- Summary strip -->
+      <div class="summary-grid" role="group" aria-label="Working Days and Target Summary">
         <div>
-          <span class="label">Weekdays (Mon–Fri)</span>
+          <span class="label">Working Days</span>
           <strong id="baseDaysDisplay">0</strong>
           <span id="netDaysSub" class="summary-sub"></span>
         </div>
@@ -1448,11 +1579,12 @@
           <span class="label">Adj. Target</span>
           <strong id="adjTargetDisplay">0.0h</strong>
         </div>
-        <div>
-          <span class="label">To Hit 100%</span>
+        <div id="remainingCell" class="remaining-cell">
+          <span class="label">Remaining to 100%</span>
           <strong id="remainingHrsDisplay">0.0h</strong>
         </div>
       </div>
+
       <div id="bankHolidayNote" class="bank-holiday-note hidden"></div>
     </section>
 
@@ -2174,6 +2306,25 @@
       refreshUI();
     };
 
+    window.jumpToToday = function() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = now.getMonth();
+
+      if (!appData.years.includes(y)) {
+        appData.years.push(y);
+        appData.years = Array.from(new Set(appData.years.map(Number))).sort((a, b) => a - b);
+        saveData();
+        renderYearOptions(y);
+      } else {
+        yearSelect.value = String(y);
+      }
+      monthSelect.value = String(m);
+      selectedJobIds.clear();
+      refreshUI();
+      showToast('Jumped to current period', 'info');
+    };
+
     function init() {
       const today = new Date();
       const currentYear = today.getFullYear();
@@ -2319,17 +2470,6 @@
       return appData.monthSettings[key];
     }
 
-    function updateSparkBars(containerId, pct) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      const spans = container.querySelectorAll('span');
-      const clamped = Math.max(12, Math.min(100, pct));
-      const weights = [0.35, 0.52, 0.45, 0.72, 0.85, 1.0];
-      spans.forEach((sp, idx) => {
-        sp.style.height = Math.max(12, Math.min(100, clamped * (weights[idx] || 0.5))) + '%';
-      });
-    }
-
     function getMonthTotals(year, month) {
       const config = getMonthConfig(year, month);
       const baseWeekdays = getWeekdaysInMonth(year, month);
@@ -2412,6 +2552,11 @@
       document.getElementById('adjTargetDisplay').textContent = targetHours.toFixed(1) + 'h';
       document.getElementById('remainingHrsDisplay').textContent = remaining.toFixed(1) + 'h';
 
+      const remainingCell = document.getElementById('remainingCell');
+      if (remainingCell) {
+        remainingCell.classList.toggle('complete', remaining <= 0 && targetHours > 0);
+      }
+
       const noteEl = document.getElementById('bankHolidayNote');
       if (bankHolidays > 0) {
         noteEl.textContent = bankHolidays + ' UK Bank Holiday' + (bankHolidays > 1 ? 's' : '') + ' deducted (' + baseWeekdays + ' weekdays → ' + effectiveDays + ' net working days)';
@@ -2424,9 +2569,6 @@
       extraDaysInput.value = config.extraDays;
       holidayDaysInput.value = config.holidayDays;
       sickDaysInput.value = config.sickDays;
-
-      updateSparkBars('reqSparkBars', reqPct);
-      updateSparkBars('givenSparkBars', givenPct);
 
       renderJobList(monthJobs, year, m);
     }
@@ -2559,13 +2701,13 @@
 
         let commentHTML = '';
         if (job.comment && job.comment.trim()) {
-          commentHTML = '<div class="speech-bubble" onclick="editJobComment(\'' + escapeHTML(jobIdStr) + '\')" title="Edit comment">💬 ' + escapeHTML(job.comment) + '</div>';
+          commentHTML = '<div class="speech-bubble" onclick="editJobComment('' + escapeHTML(jobIdStr) + '')" title="Edit comment">💬 ' + escapeHTML(job.comment) + '</div>';
         }
 
         const isSelected = selectedJobIds.has(jobIdStr);
         const isChecked = isSelected ? 'checked' : '';
         const quickGivenBtn = isPending
-          ? '<button type="button" class="btn-quick-given" onclick="quickSetGiven(\'' + escapeHTML(jobIdStr) + '\')">Set Given</button>'
+          ? '<button type="button" class="btn-quick-given" onclick="quickSetGiven('' + escapeHTML(jobIdStr) + '')">Set Given</button>'
           : '';
 
         const jd = new Date((job.date || '') + 'T00:00:00');
@@ -2581,9 +2723,9 @@
         item.innerHTML =
           '<div class="job-top">' +
             '<div class="job-title-group">' +
-              '<input type="checkbox" class="job-checkbox" value="' + escapeHTML(jobIdStr) + '" ' + isChecked + ' onchange="toggleJobSelection(\'' + escapeHTML(jobIdStr) + '\', this)" style="width:17px;height:17px;accent-color:var(--cyan);cursor:pointer;" />' +
-              '<span class="wip-pill" onclick="editJobComment(\'' + escapeHTML(jobIdStr) + '\')" title="Add/edit comment">WIP #' + escapeHTML(job.wip) + '</span>' +
-              '<a class="reg-link" onclick="showVehicleHistory(\'' + escapeHTML((job.reg || '').replace(/'/g, "\\'")) + '\')" title="View vehicle history">' + escapeHTML(job.reg || '') + '</a>' +
+              '<input type="checkbox" class="job-checkbox" value="' + escapeHTML(jobIdStr) + '" ' + isChecked + ' onchange="toggleJobSelection('' + escapeHTML(jobIdStr) + '', this)" style="width:17px;height:17px;accent-color:var(--cyan);cursor:pointer;" />' +
+              '<span class="wip-pill" onclick="editJobComment('' + escapeHTML(jobIdStr) + '')" title="Add/edit comment">WIP #' + escapeHTML(job.wip) + '</span>' +
+              '<a class="reg-link" onclick="showVehicleHistory('' + escapeHTML((job.reg || '').replace(/'/g, "\'")) + '')" title="View vehicle history">' + escapeHTML(job.reg || '') + '</a>' +
               flagBadge + periodTag +
             '</div>' +
             '<span style="font-size:0.78rem;color:var(--muted);white-space:nowrap;">' + escapeHTML(job.date) + '</span>' +
@@ -2594,9 +2736,9 @@
             '<div>Shouted / Called: <strong>' + req.toFixed(1) + 'h</strong> · Paid / Given: ' + givenDisplay + '</div>' +
             '<div class="job-actions">' +
               quickGivenBtn +
-              '<button type="button" onclick="duplicateJob(\'' + escapeHTML(jobIdStr) + '\')" class="btn-secondary" title="Load as template for a new job">Copy</button>' +
-              '<button type="button" onclick="editJob(\'' + escapeHTML(jobIdStr) + '\')" class="btn-secondary">Edit</button>' +
-              '<button type="button" onclick="deleteJob(\'' + escapeHTML(jobIdStr) + '\')" class="btn-del">Del</button>' +
+              '<button type="button" onclick="duplicateJob('' + escapeHTML(jobIdStr) + '')" class="btn-secondary" title="Load as template for a new job">Copy</button>' +
+              '<button type="button" onclick="editJob('' + escapeHTML(jobIdStr) + '')" class="btn-secondary">Edit</button>' +
+              '<button type="button" onclick="deleteJob('' + escapeHTML(jobIdStr) + '')" class="btn-del">Del</button>' +
             '</div>' +
           '</div>';
         jobList.appendChild(item);
@@ -2757,7 +2899,9 @@
       if (!job) return;
       const newComment = await customPrompt('Comment for WIP #' + job.wip, 'Enter or edit notes:', job.comment || '', true);
       if (newComment !== null) {
-        job.comment = newComment.replace(/\r\n/g, '\n').trim();
+        job.comment = newComment.replace(/
+/g, '
+').trim();
         saveData();
         refreshUI();
         showToast('Comment saved', 'success');
@@ -2909,8 +3053,10 @@
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        const text = (e.target.result || '').replace(/^\uFEFF/, '');
-        const lines = text.split(/\r\n|\n/);
+        const text = (e.target.result || '').replace(/^﻿/, '');
+        const lines = text.split(/
+|
+/);
         if (lines.length < 2) {
           showToast('CSV appears empty', 'error');
           return;
@@ -2930,7 +3076,7 @@
 
         function parseHourVal(str) {
           if (!str) return null;
-          const cleaned = String(str).replace(/\u00a0/g, ' ').toLowerCase().replace(/hrs?/g, '').trim().replace(',', '.');
+          const cleaned = String(str).replace(/ /g, ' ').toLowerCase().replace(/hrs?/g, '').trim().replace(',', '.');
           const val = parseFloat(cleaned);
           return isNaN(val) ? null : val;
         }
@@ -3117,7 +3263,8 @@
         j.reqHrs,
         j.givenHrs ?? ''
       ]);
-      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('
+');
       downloadFile(csvContent, 'workshop_efficiency_log.csv', 'text/csv');
       showToast('CSV exported', 'success');
     });
