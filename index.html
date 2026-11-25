@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -2701,13 +2701,13 @@
 
         let commentHTML = '';
         if (job.comment && job.comment.trim()) {
-          commentHTML = '<div class="speech-bubble" onclick="editJobComment('' + escapeHTML(jobIdStr) + '')" title="Edit comment">💬 ' + escapeHTML(job.comment) + '</div>';
+          commentHTML = '<div class="speech-bubble" onclick="editJobComment(\'' + escapeHTML(jobIdStr) + '\')" title="Edit comment">💬 ' + escapeHTML(job.comment) + '</div>';
         }
 
         const isSelected = selectedJobIds.has(jobIdStr);
         const isChecked = isSelected ? 'checked' : '';
         const quickGivenBtn = isPending
-          ? '<button type="button" class="btn-quick-given" onclick="quickSetGiven('' + escapeHTML(jobIdStr) + '')">Set Given</button>'
+          ? '<button type="button" class="btn-quick-given" onclick="quickSetGiven(\'' + escapeHTML(jobIdStr) + '\')">Set Given</button>'
           : '';
 
         const jd = new Date((job.date || '') + 'T00:00:00');
@@ -2723,9 +2723,9 @@
         item.innerHTML =
           '<div class="job-top">' +
             '<div class="job-title-group">' +
-              '<input type="checkbox" class="job-checkbox" value="' + escapeHTML(jobIdStr) + '" ' + isChecked + ' onchange="toggleJobSelection('' + escapeHTML(jobIdStr) + '', this)" style="width:17px;height:17px;accent-color:var(--cyan);cursor:pointer;" />' +
-              '<span class="wip-pill" onclick="editJobComment('' + escapeHTML(jobIdStr) + '')" title="Add/edit comment">WIP #' + escapeHTML(job.wip) + '</span>' +
-              '<a class="reg-link" onclick="showVehicleHistory('' + escapeHTML((job.reg || '').replace(/'/g, "\'")) + '')" title="View vehicle history">' + escapeHTML(job.reg || '') + '</a>' +
+              '<input type="checkbox" class="job-checkbox" value="' + escapeHTML(jobIdStr) + '" ' + isChecked + ' onchange="toggleJobSelection(\'' + escapeHTML(jobIdStr) + '\', this)" style="width:17px;height:17px;accent-color:var(--cyan);cursor:pointer;" />' +
+              '<span class="wip-pill" onclick="editJobComment(\'' + escapeHTML(jobIdStr) + '\')" title="Add/edit comment">WIP #' + escapeHTML(job.wip) + '</span>' +
+              '<a class="reg-link" onclick="showVehicleHistory(\'' + escapeHTML((job.reg || '').replace(/'/g, "\\'")) + '\')" title="View vehicle history">' + escapeHTML(job.reg || '') + '</a>' +
               flagBadge + periodTag +
             '</div>' +
             '<span style="font-size:0.78rem;color:var(--muted);white-space:nowrap;">' + escapeHTML(job.date) + '</span>' +
@@ -2736,9 +2736,9 @@
             '<div>Shouted / Called: <strong>' + req.toFixed(1) + 'h</strong> · Paid / Given: ' + givenDisplay + '</div>' +
             '<div class="job-actions">' +
               quickGivenBtn +
-              '<button type="button" onclick="duplicateJob('' + escapeHTML(jobIdStr) + '')" class="btn-secondary" title="Load as template for a new job">Copy</button>' +
-              '<button type="button" onclick="editJob('' + escapeHTML(jobIdStr) + '')" class="btn-secondary">Edit</button>' +
-              '<button type="button" onclick="deleteJob('' + escapeHTML(jobIdStr) + '')" class="btn-del">Del</button>' +
+              '<button type="button" onclick="duplicateJob(\'' + escapeHTML(jobIdStr) + '\')" class="btn-secondary" title="Load as template for a new job">Copy</button>' +
+              '<button type="button" onclick="editJob(\'' + escapeHTML(jobIdStr) + '\')" class="btn-secondary">Edit</button>' +
+              '<button type="button" onclick="deleteJob(\'' + escapeHTML(jobIdStr) + '\')" class="btn-del">Del</button>' +
             '</div>' +
           '</div>';
         jobList.appendChild(item);
@@ -2899,9 +2899,7 @@
       if (!job) return;
       const newComment = await customPrompt('Comment for WIP #' + job.wip, 'Enter or edit notes:', job.comment || '', true);
       if (newComment !== null) {
-        job.comment = newComment.replace(/
-/g, '
-').trim();
+        job.comment = newComment.replace(/\r\n/g, '\n').trim();
         saveData();
         refreshUI();
         showToast('Comment saved', 'success');
@@ -3053,10 +3051,8 @@
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        const text = (e.target.result || '').replace(/^﻿/, '');
-        const lines = text.split(/
-|
-/);
+        const text = (e.target.result || '').replace(/^\uFEFF/, '');
+        const lines = text.split(/\r\n|\n/);
         if (lines.length < 2) {
           showToast('CSV appears empty', 'error');
           return;
@@ -3076,7 +3072,7 @@
 
         function parseHourVal(str) {
           if (!str) return null;
-          const cleaned = String(str).replace(/ /g, ' ').toLowerCase().replace(/hrs?/g, '').trim().replace(',', '.');
+          const cleaned = String(str).replace(/\u00a0/g, ' ').toLowerCase().replace(/hrs?/g, '').trim().replace(',', '.');
           const val = parseFloat(cleaned);
           return isNaN(val) ? null : val;
         }
@@ -3263,8 +3259,7 @@
         j.reqHrs,
         j.givenHrs ?? ''
       ]);
-      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('
-');
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
       downloadFile(csvContent, 'workshop_efficiency_log.csv', 'text/csv');
       showToast('CSV exported', 'success');
     });
@@ -3316,3 +3311,4 @@
   </script>
 </body>
 </html>
+
