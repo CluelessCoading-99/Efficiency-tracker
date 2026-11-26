@@ -82,16 +82,6 @@
       letter-spacing: 0.02em;
       white-space: nowrap;
     }
-    .count-pill {
-      background: rgba(34, 211, 238, 0.1);
-      border: 1px solid rgba(34, 211, 238, 0.26);
-      color: var(--cyan);
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 999px;
-      white-space: nowrap;
-    }
 
     .cog-btn {
       width: 36px; height: 36px; padding: 0; border-radius: 11px;
@@ -437,7 +427,6 @@
 
     /* Job Log & Search */
     .list-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 11px; flex-wrap: wrap; }
-    .list-header-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .list-header h2 { font-size: 1.01rem; margin-bottom: 0; }
     .list-header select { width: auto; min-width: 138px; padding: 7px 10px; font-size: 0.82rem; font-weight: 600; }
     .list-controls, .batch-bar-actions, .job-actions { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
@@ -779,10 +768,7 @@
         <div id="printSheetHeader" class="print-sheet-header"></div>
 
         <div class="list-header">
-          <div class="list-header-left">
-            <h2>Job Log</h2>
-            <span id="jobLogCountBadge" class="count-pill tabular">0 of 0</span>
-          </div>
+          <h2>Job Log</h2>
           <div class="list-controls">
             <select id="filterSelect" aria-label="Filter jobs">
               <option value="today" selected>Today Only</option>
@@ -1881,10 +1867,6 @@
       });
 
       currentRenderedJobs = filtered;
-      $('jobLogCountBadge').textContent = isSearching
-        ? `Showing ${filtered.length} match${filtered.length === 1 ? '' : 'es'}`
-        : `Showing ${filtered.length} of ${monthJobs.length} this month`;
-
       $('searchScopeNote').classList.toggle('hidden', !isSearching);
       if (isSearching) $('searchScopeText').textContent = `Showing ${filtered.length} match(es) across all logged entries`;
 
