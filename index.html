@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -313,7 +313,22 @@
     .summary-sub { display: block; font-size: 0.7rem; color: var(--cyan); margin-top: 2px; font-weight: 600; }
     .bank-holiday-note { font-size: 0.76rem; color: var(--muted); text-align: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
 
-    /* Report Pie Chart & Breakdown */
+    /* Report Top Bar & Pie Charts */
+    .report-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 16px;
+      box-shadow: var(--shadow-card);
+    }
+    .report-toolbar-title { font-size: 0.95rem; font-weight: 800; color: var(--text); }
+    .report-toolbar-sub { font-size: 0.76rem; color: var(--muted); margin-top: 1px; }
+
     .report-layout {
       display: grid;
       grid-template-columns: 196px 1fr;
@@ -534,10 +549,10 @@
 
     @media print {
       @page { margin: 12mm; }
-      body { background: #fff !important; color: #111 !important; padding: 0 !important; font-size: 11pt; }
+      body { background: #fff !important; color: #111 !important; padding: 0 !important; font-size: 10.5pt; }
       .top-bar, .view-tabs, .backup-banner, #telemetryCard, #reportView, #jobFormCard, .search-box, .search-scope-note,
       .batch-bar, .job-actions, .job-checkbox, .cog-btn, .period-nav-btn, .today-btn,
-      #toastContainer, .modal-backdrop, .list-controls, .list-header, .year-add-inside-btn, .form-actions { display: none !important; }
+      #toastContainer, .modal-backdrop, .list-controls, .list-header, .year-add-inside-btn, .form-actions, .report-toolbar { display: none !important; }
       .container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
       #jobLogCard { background: #fff !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
       .print-sheet-header { display: block !important; border-bottom: 2px solid #222; padding-bottom: 10px; margin-bottom: 14px; }
@@ -556,6 +571,22 @@
       .wip-pill { background: #e2e8f0 !important; color: #0f172a !important; border: 1px solid #64748b !important; }
       .speech-bubble { background: #f8fafc !important; color: #0f172a !important; border: 1px solid #94a3b8 !important; font-weight: 500; }
       .speech-bubble::before { display: none !important; }
+
+      /* Report Print Mode */
+      body.print-report-mode #jobLogCard { display: none !important; }
+      body.print-report-mode #reportView { display: flex !important; }
+      body.print-report-mode #reportView .card { background: #fff !important; border: 1px solid #cbd5e1 !important; box-shadow: none !important; break-inside: avoid; }
+      body.print-report-mode #reportView h2,
+      body.print-report-mode #reportView .pie-center-num,
+      body.print-report-mode #reportView .legend-name,
+      body.print-report-mode #reportView .legend-count,
+      body.print-report-mode #reportView .report-table td { color: #111 !important; }
+      body.print-report-mode #reportView .hint,
+      body.print-report-mode #reportView .legend-rule,
+      body.print-report-mode #reportView .pie-center-lbl { color: #475569 !important; }
+      body.print-report-mode #reportView .legend-card,
+      body.print-report-mode #reportView .report-table-wrap,
+      body.print-report-mode #reportView .report-table th { background: #f8fafc !important; border-color: #cbd5e1 !important; color: #111 !important; }
     }
   </style>
 </head>
@@ -572,7 +603,7 @@
           <button type="button" id="openSettingsBtn" onclick="openSettingsModal()" class="cog-btn" title="Settings, Import & Export" aria-label="Open Settings">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
               <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
           </button>
         </div>
@@ -772,6 +803,16 @@
 
     <!-- REPORT VIEW -->
     <div id="reportView" class="hidden" style="display:flex; flex-direction:column; gap:14px;">
+      <div id="printReportHeader" class="print-sheet-header"></div>
+
+      <div class="report-toolbar">
+        <div>
+          <div id="reportPeriodSummary" class="report-toolbar-title">Monthly Pie Summary</div>
+          <div class="report-toolbar-sub">Automatically updates when you change the Period month or year above</div>
+        </div>
+        <button type="button" id="printReportBtn" onclick="printMonthlyReport()" class="btn-print" style="padding: 8px 13px; font-size: 0.83rem;">🖨️ Print Report</button>
+      </div>
+
       <!-- Chart 1: Work Section Breakdown -->
       <section class="card">
         <div class="list-header">
@@ -1158,6 +1199,8 @@
       const monthName = $('monthSelect').options[m]?.textContent || '';
       const { monthJobs, totalReq, totalGiven } = getMonthTotals(year, m);
 
+      $('reportPeriodSummary').textContent = `${monthName} ${year} — Pie Summary`;
+
       // 1. Work Section Breakdown (multi-bucket)
       $('reportHeading').textContent = `${monthName} ${year} WIP Breakdown`;
       $('reportTotalBadge').textContent = `${monthJobs.length} WIP${monthJobs.length === 1 ? '' : 's'}`;
@@ -1274,6 +1317,31 @@
           </tr>`;
       }).join('');
     }
+
+    window.printMonthlyReport = () => {
+      const year = parseInt($('yearSelect').value, 10) || new Date().getFullYear();
+      const month = parseInt($('monthSelect').value, 10);
+      const m = Number.isNaN(month) ? new Date().getMonth() : month;
+      const monthName = $('monthSelect').options[m]?.textContent || '';
+      const { monthJobs, totalReq, totalGiven } = getMonthTotals(year, m);
+      const retailCount = monthJobs.filter(j => normalizeBillingType(j) === 'retail').length;
+      const warrantyCount = monthJobs.length - retailCount;
+      const tech = getActiveTechnician();
+
+      $('printReportHeader').innerHTML = `
+        <div class="print-sheet-title">Monthly Pie Chart Report — ${escapeHTML(monthName + ' ' + year)}</div>
+        <div class="print-sheet-meta">Technician: <strong>${escapeHTML(tech.name)}</strong> &bull; Printed: ${escapeHTML(getLocalDateISO())}</div>
+        <div class="print-sheet-totals">
+          <span><strong>Distinct WIPs:</strong> ${monthJobs.length}</span>
+          <span><strong>Retail:</strong> ${retailCount}</span>
+          <span><strong>Warranty / Ext / Used:</strong> ${warrantyCount}</span>
+          <span><strong>Requested:</strong> ${totalReq.toFixed(1)}h</span>
+          <span><strong>Given:</strong> ${totalGiven.toFixed(1)}h</span>
+        </div>`;
+
+      document.body.classList.add('print-report-mode');
+      window.print();
+    };
 
     // ========== UK BANK HOLIDAYS (England & Wales) ==========
     function easterSunday(year) {
@@ -1923,11 +1991,15 @@
           ${pendingCount > 0 ? `<span><strong>Pending:</strong> ${pendingCount}</span>` : ''}
         </div>`;
 
+      document.body.classList.remove('print-report-mode');
       document.body.classList.toggle('print-selected-only', hasSelection);
       window.print();
     };
 
-    window.addEventListener('afterprint', () => document.body.classList.remove('print-selected-only'));
+    window.addEventListener('afterprint', () => {
+      document.body.classList.remove('print-selected-only');
+      document.body.classList.remove('print-report-mode');
+    });
 
     window.deleteSelectedJobs = async () => {
       if (!selectedJobIds.size) return;
@@ -2287,5 +2359,3 @@
   </script>
 </body>
 </html>
-
-
