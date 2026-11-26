@@ -82,6 +82,16 @@
       letter-spacing: 0.02em;
       white-space: nowrap;
     }
+    .count-pill {
+      background: rgba(34, 211, 238, 0.1);
+      border: 1px solid rgba(34, 211, 238, 0.26);
+      color: var(--cyan);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
 
     .cog-btn {
       width: 36px; height: 36px; padding: 0; border-radius: 11px;
@@ -398,6 +408,14 @@
     }
     .report-table td { padding: 9px 11px; border-bottom: 1px solid rgba(148, 163, 184, 0.09); color: var(--text-secondary); white-space: nowrap; }
     .report-table tr:last-child td { border-bottom: none; }
+    .report-table tfoot td {
+      padding: 9px 11px;
+      font-weight: 800;
+      color: var(--text);
+      background: rgba(15, 23, 36, 0.85);
+      border-top: 1px solid var(--border-strong);
+      white-space: nowrap;
+    }
 
     /* Form & Checklists */
     .settings-grid, .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0 10px; }
@@ -419,6 +437,7 @@
 
     /* Job Log & Search */
     .list-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 11px; flex-wrap: wrap; }
+    .list-header-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .list-header h2 { font-size: 1.01rem; margin-bottom: 0; }
     .list-header select { width: auto; min-width: 138px; padding: 7px 10px; font-size: 0.82rem; font-weight: 600; }
     .list-controls, .batch-bar-actions, .job-actions { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
@@ -574,19 +593,21 @@
 
       /* Report Print Mode */
       body.print-report-mode #jobLogCard { display: none !important; }
-      body.print-report-mode #reportView { display: flex !important; }
+      body.print-report-mode #reportView { display: flex !important; flex-direction: column !important; }
       body.print-report-mode #reportView .card { background: #fff !important; border: 1px solid #cbd5e1 !important; box-shadow: none !important; break-inside: avoid; }
       body.print-report-mode #reportView h2,
       body.print-report-mode #reportView .pie-center-num,
       body.print-report-mode #reportView .legend-name,
       body.print-report-mode #reportView .legend-count,
-      body.print-report-mode #reportView .report-table td { color: #111 !important; }
+      body.print-report-mode #reportView .report-table td,
+      body.print-report-mode #reportView .report-table tfoot td { color: #111 !important; }
       body.print-report-mode #reportView .hint,
       body.print-report-mode #reportView .legend-rule,
       body.print-report-mode #reportView .pie-center-lbl { color: #475569 !important; }
       body.print-report-mode #reportView .legend-card,
       body.print-report-mode #reportView .report-table-wrap,
-      body.print-report-mode #reportView .report-table th { background: #f8fafc !important; border-color: #cbd5e1 !important; color: #111 !important; }
+      body.print-report-mode #reportView .report-table th,
+      body.print-report-mode #reportView .report-table tfoot td { background: #f8fafc !important; border-color: #cbd5e1 !important; color: #111 !important; }
     }
   </style>
 </head>
@@ -758,7 +779,10 @@
         <div id="printSheetHeader" class="print-sheet-header"></div>
 
         <div class="list-header">
-          <h2>Job Log</h2>
+          <div class="list-header-left">
+            <h2>Job Log</h2>
+            <span id="jobLogCountBadge" class="count-pill tabular">0 of 0</span>
+          </div>
           <div class="list-controls">
             <select id="filterSelect" aria-label="Filter jobs">
               <option value="today" selected>Today Only</option>
@@ -846,6 +870,7 @@
               </tr>
             </thead>
             <tbody id="reportTableBody"></tbody>
+            <tfoot id="reportTableFoot"></tfoot>
           </table>
         </div>
         <p id="reportTotalsNote" class="hint" style="margin-top:10px;"></p>
@@ -885,6 +910,7 @@
               </tr>
             </thead>
             <tbody id="billingTableBody"></tbody>
+            <tfoot id="billingTableFoot"></tfoot>
           </table>
         </div>
       </section>
@@ -1213,6 +1239,8 @@
       };
 
       let totalSliceHits = 0;
+      let totalSectionReq = 0;
+      let totalSectionGiven = 0;
       monthJobs.forEach(job => {
         const buckets = getJobReportCategories(job);
         const req = parseFloat(job.reqHrs) || 0;
@@ -1222,6 +1250,8 @@
           sectionStats[key].reqHrs += req;
           sectionStats[key].givenHrs += given;
           totalSliceHits += 1;
+          totalSectionReq += req;
+          totalSectionGiven += given;
         });
       });
 
@@ -1258,6 +1288,15 @@
             <td>${s.givenHrs.toFixed(1)}h</td>
           </tr>`;
       }).join('');
+
+      $('reportTableFoot').innerHTML = `
+        <tr>
+          <td>Total (Matches)</td>
+          <td>${totalSliceHits}</td>
+          <td>${totalSliceHits > 0 ? '100.0%' : '0.0%'}</td>
+          <td>${totalSectionReq.toFixed(1)}h</td>
+          <td>${totalSectionGiven.toFixed(1)}h</td>
+        </tr>`;
 
       const combinedCount = monthJobs.filter(j => getJobReportCategories(j).length > 1).length;
       $('reportTotalsNote').textContent =
@@ -1315,6 +1354,15 @@
             <td>${s.givenHrs.toFixed(1)}h</td>
           </tr>`;
       }).join('');
+
+      $('billingTableFoot').innerHTML = `
+        <tr>
+          <td>Total</td>
+          <td>${monthJobs.length}</td>
+          <td>${monthJobs.length > 0 ? '100.0%' : '0.0%'}</td>
+          <td>${totalReq.toFixed(1)}h</td>
+          <td>${totalGiven.toFixed(1)}h</td>
+        </tr>`;
     }
 
     window.printMonthlyReport = () => {
@@ -1833,6 +1881,10 @@
       });
 
       currentRenderedJobs = filtered;
+      $('jobLogCountBadge').textContent = isSearching
+        ? `Showing ${filtered.length} match${filtered.length === 1 ? '' : 'es'}`
+        : `Showing ${filtered.length} of ${monthJobs.length} this month`;
+
       $('searchScopeNote').classList.toggle('hidden', !isSearching);
       if (isSearching) $('searchScopeText').textContent = `Showing ${filtered.length} match(es) across all logged entries`;
 
