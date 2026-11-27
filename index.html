@@ -833,7 +833,7 @@
           </div>
         </div>
         <p class="hint" style="margin-top:0; margin-bottom:14px;">
-          Checks each WIP description for <strong>PDI / UCI / UCC</strong> (<code>pdi</code>, <code>uci</code>, <code>ucc</code>), <strong>Diagnosis</strong> (<code>inv</code> / <code>investigate</code>), and <strong>Service</strong> (<code>service</code>). Combined WIPs count in each matching section; anything else counts as <strong>Upsell</strong>.
+          Checks each WIP description for <strong>Sales</strong> (<code>pdi</code>, <code>uci</code>, <code>ucc</code>), <strong>Diagnosis</strong> (<code>inv</code> / <code>investigate</code>), and <strong>Service</strong> (<code>service</code>). Combined WIPs count in each matching section; anything else counts as <strong>Upsell</strong>.
         </p>
 
         <div class="report-layout">
@@ -961,10 +961,10 @@
       <h2 class="splash-title">How Jobs Are Allocated Into the WIP Pie Chart</h2>
       <p class="splash-copy">Each job in the selected month is checked against your <strong>Job Description</strong> (and Service checklists) to allocate it into one or more slices:</p>
       <div class="guide-list">
-        <div class="guide-step"><strong>PDI / UCI / UCC:</strong> Type <code>PDI</code>, <code>UCI</code> (Used Car Inspection), or <code>UCC</code> (Used Car Check) in the <strong>Job Description</strong> box to allocate it to <strong>PDI</strong>.</div>
+        <div class="guide-step"><strong>Sales:</strong> Type <code>PDI</code>, <code>UCI</code> (Used Car Inspection), or <code>UCC</code> (Used Car Check) in the <strong>Job Description</strong> box to allocate it to <strong>Sales</strong>.</div>
         <div class="guide-step"><strong>Diagnosis:</strong> Type <code>Inv</code> or <code>Investigate</code> (e.g. <code>Inv wipers don't work</code>) in the <strong>Job Description</strong> box so the chart allocates it to <strong>Diagnosis</strong>.</div>
         <div class="guide-step"><strong>Service:</strong> Type <code>Service</code> in the <strong>Job Description</strong> box or tick <strong>Service A</strong> / <strong>Service B</strong> in the checklist to allocate it to <strong>Service</strong>.</div>
-        <div class="guide-step"><strong>Upsell:</strong> Any job that does not match PDI / UCI / UCC, Diagnosis, or Service (such as approved follow-up or repair work) is allocated to <strong>Upsell</strong>.</div>
+        <div class="guide-step"><strong>Upsell:</strong> Any job that does not match Sales (PDI / UCI / UCC), Diagnosis, or Service (such as approved follow-up or repair work) is allocated to <strong>Upsell</strong>.</div>
         <div class="guide-step"><strong>Combined Jobs:</strong> If a single job description covers more than one area (for example, <code>Service A + Inv wipers</code> or <code>UCC + Service</code>), it counts in each matching slice so you see every section involved.</div>
       </div>
       <div class="splash-actions"><button type="button" onclick="closeWipChartInfoSplash()" class="btn-primary">Got It</button></div>
@@ -1119,7 +1119,7 @@
     };
 
     const REPORT_BUCKETS = [
-      { key: 'pdi', label: 'PDI / UCI / UCC', rule: 'Description contains "PDI", "UCI" or "UCC"', color: '#22d3ee' },
+      { key: 'pdi', label: 'Sales', rule: 'Description contains "PDI", "UCI" or "UCC"', color: '#22d3ee' },
       { key: 'diagnosis', label: 'Diagnosis', rule: 'Description contains "Inv" or "Investigate"', color: '#f59e0b' },
       { key: 'service', label: 'Service', rule: 'Description or checklist contains "Service"', color: '#10b981' },
       { key: 'upsell', label: 'Upsell', rule: 'Other WIPs (e.g. approved follow-up work)', color: '#a78bfa' }
