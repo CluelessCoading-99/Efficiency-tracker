@@ -833,7 +833,7 @@
           </div>
         </div>
         <p class="hint" style="margin-top:0; margin-bottom:14px;">
-          Checks each WIP description for <strong>PDI</strong> (<code>pdi</code>), <strong>Diagnosis</strong> (<code>inv</code> / <code>investigate</code>), and <strong>Service</strong> (<code>service</code>). Combined WIPs count in each matching section; anything else counts as <strong>Upsell</strong>.
+          Checks each WIP description for <strong>PDI / UCI / UCC</strong> (<code>pdi</code>, <code>uci</code>, <code>ucc</code>), <strong>Diagnosis</strong> (<code>inv</code> / <code>investigate</code>), and <strong>Service</strong> (<code>service</code>). Combined WIPs count in each matching section; anything else counts as <strong>Upsell</strong>.
         </p>
 
         <div class="report-layout">
@@ -948,7 +948,7 @@
         <div class="guide-step"><strong>2. Column B:</strong> Numeric WIP. Duplicate WIPs in the file have their hours summed.</div>
         <div class="guide-step"><strong>3. Column C:</strong> YYYY-MM-DD, DD/MM/YYYY or DD-MM-YYYY.</div>
         <div class="guide-step"><strong>4. Columns D & E:</strong> Plain decimal numbers using <strong>decimal points (.)</strong> rather than commas (e.g. <code>1.6</code>). Make sure your regional options are set to <strong>UK / Great Britain</strong> so Excel and your system output decimal points rather than commas. Leave E blank if pending.</div>
-        <div class="guide-step"><strong>5. Save as CSV:</strong> File → Save As → CSV (what ever you want to call it).</div>
+        <div class="guide-step"><strong>5. Save as CSV:</strong> File → Save As → CSV (Comma delimited).</div>
       </div>
       <div class="splash-actions"><button type="button" onclick="closeCsvInfoSplash()" class="btn-primary">Got It</button></div>
     </div>
@@ -961,11 +961,11 @@
       <h2 class="splash-title">How Jobs Are Allocated Into the WIP Pie Chart</h2>
       <p class="splash-copy">Each job in the selected month is checked against your <strong>Job Description</strong> (and Service checklists) to allocate it into one or more slices:</p>
       <div class="guide-list">
+        <div class="guide-step"><strong>PDI / UCI / UCC:</strong> Type <code>PDI</code>, <code>UCI</code> (Used Car Inspection), or <code>UCC</code> (Used Car Check) in the <strong>Job Description</strong> box to allocate it to <strong>PDI</strong>.</div>
         <div class="guide-step"><strong>Diagnosis:</strong> Type <code>Inv</code> or <code>Investigate</code> (e.g. <code>Inv wipers don't work</code>) in the <strong>Job Description</strong> box so the chart allocates it to <strong>Diagnosis</strong>.</div>
-        <div class="guide-step"><strong>PDI:</strong> Type <code>PDI</code> in the <strong>Job Description</strong> box to allocate it to <strong>PDI</strong>.</div>
         <div class="guide-step"><strong>Service:</strong> Type <code>Service</code> in the <strong>Job Description</strong> box or tick <strong>Service A</strong> / <strong>Service B</strong> in the checklist to allocate it to <strong>Service</strong>.</div>
-        <div class="guide-step"><strong>Upsell:</strong> Any job that does not match PDI, Diagnosis, or Service (such as approved follow-up or repair work) is allocated to <strong>Upsell</strong>.</div>
-        <div class="guide-step"><strong>Combined Jobs:</strong> If a single job description covers more than one area (for example, <code>Service A + Inv wipers</code>), it counts in each matching slice so you see every section involved.</div>
+        <div class="guide-step"><strong>Upsell:</strong> Any job that does not match PDI / UCI / UCC, Diagnosis, or Service (such as approved follow-up or repair work) is allocated to <strong>Upsell</strong>.</div>
+        <div class="guide-step"><strong>Combined Jobs:</strong> If a single job description covers more than one area (for example, <code>Service A + Inv wipers</code> or <code>UCC + Service</code>), it counts in each matching slice so you see every section involved.</div>
       </div>
       <div class="splash-actions"><button type="button" onclick="closeWipChartInfoSplash()" class="btn-primary">Got It</button></div>
     </div>
@@ -1119,7 +1119,7 @@
     };
 
     const REPORT_BUCKETS = [
-      { key: 'pdi', label: 'PDI', rule: 'Description contains "PDI"', color: '#22d3ee' },
+      { key: 'pdi', label: 'PDI / UCI / UCC', rule: 'Description contains "PDI", "UCI" or "UCC"', color: '#22d3ee' },
       { key: 'diagnosis', label: 'Diagnosis', rule: 'Description contains "Inv" or "Investigate"', color: '#f59e0b' },
       { key: 'service', label: 'Service', rule: 'Description or checklist contains "Service"', color: '#10b981' },
       { key: 'upsell', label: 'Upsell', rule: 'Other WIPs (e.g. approved follow-up work)', color: '#a78bfa' }
@@ -1217,7 +1217,7 @@
       const hasServiceChecklist = Boolean(job?.categories && (job.categories.serviceA || job.categories.serviceB));
       const matches = [];
 
-      if (/\bpdi\b/i.test(text)) matches.push('pdi');
+      if (/\b(?:pdi|uci|ucc)\b/i.test(text)) matches.push('pdi');
       if (/\binv\b|\binvestigat/i.test(text)) matches.push('diagnosis');
       if (/\bservice\b/i.test(text) || hasServiceChecklist) matches.push('service');
 
